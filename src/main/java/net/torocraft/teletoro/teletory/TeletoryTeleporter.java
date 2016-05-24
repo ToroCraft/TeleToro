@@ -8,6 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.LongHashMap;
@@ -18,6 +19,8 @@ import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
 
 public class TeletoryTeleporter extends Teleporter {
+
+	public static final double TRAVEL_FACTOR = 1;
 
 	/*
 	 * fix portal cache support one block off problems remove portal particles
@@ -54,8 +57,6 @@ public class TeletoryTeleporter extends Teleporter {
 			this.placeInExistingPortal(entityIn, rotationYaw);
 		}
 	}
-
-	private static final double TRAVEL_FACTOR = 100;
 
 	public static class PortalSearchState {
 
@@ -101,8 +102,6 @@ public class TeletoryTeleporter extends Teleporter {
 			}
 
 			System.out.println("search location x[" + xSearch + "] z[" + zSearch + "]");
-
-
 		}
 
 	}
@@ -110,6 +109,8 @@ public class TeletoryTeleporter extends Teleporter {
 	public boolean placeInExistingPortal(Entity entity, float rotationYaw) {
 
 		PortalSearchState search = new PortalSearchState(entity, world);
+
+		System.out.println("search cache for portal with key [" + search.longXZPair + "]");
 
 		if (portalIsCached(search.longXZPair)) {
 			readCachedPortal(search, search.longXZPair);
@@ -189,6 +190,15 @@ public class TeletoryTeleporter extends Teleporter {
 		entity.motionX = entity.motionY = entity.motionZ = 0.0D;
 
 		entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
+
+		if (entity instanceof EntityPlayerMP) {
+			System.out.println("EntityPlayerMP");
+			((EntityPlayerMP) entity).playerNetServerHandler.setPlayerLocation(x, y, z, entity.rotationYaw, entity.rotationPitch);
+		} else {
+			System.out.println("Not EntityPlayerMP");
+			entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
+		}
+
 	}
 
 	private void handleFoundPortal_OriginalWithBug(Entity entity, float rotationYaw, PortalSearchState search) {

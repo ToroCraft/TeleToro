@@ -2,9 +2,13 @@ package net.torocraft.teletoro.teletory;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.DamageSource;
 import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -41,8 +45,27 @@ public class Teletory {
 	}
 
 	
+	@SubscribeEvent
+	public void fallOutOfTeletory(LivingHurtEvent ev) {
+		if (!(ev.getEntity() instanceof EntityPlayerMP)) {
+			return;
+		}
 
-	
+		if (ev.getSource() != DamageSource.outOfWorld) {
+			return;
+		}
+
+		EntityPlayerMP thePlayer = (EntityPlayerMP) ev.getEntity();
+
+		if (thePlayer.dimension != Teletory.DIMID) {
+			return;
+		}
+
+		ev.setCanceled(true);
+
+		thePlayer.mcServer.getPlayerList().transferPlayerToDimension(thePlayer, 0, new FallFromTeletoryTeleporter(thePlayer.mcServer.worldServerForDimension(0)));
+
+	}
 
 
 }
