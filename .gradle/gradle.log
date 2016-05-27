@@ -1,5 +1,5 @@
 #################################################
-         ForgeGradle 2.1-SNAPSHOT-da90449        
+         ForgeGradle 2.2-SNAPSHOT-4a31fd6        
   https://github.com/MinecraftForge/ForgeGradle  
 #################################################
                Powered by MCP unknown               
@@ -10,6 +10,7 @@
 :deobfCompileDummyTask
 :deobfProvidedDummyTask
 :eclipseClasspath
+Download https://libraries.minecraft.net/it/unimi/dsi/fastutil/7.0.12_mojang/fastutil-7.0.12_mojang-sources.jar
 :eclipseJdt
 :eclipseProject
 :getVersionJson
@@ -18,10 +19,10 @@
 :getAssetIndex UP-TO-DATE
 :getAssets
 :makeStart SKIPPED
-:makeEclipseCleanRunClient UP-TO-DATE
+:makeEclipseCleanRunClient
 :makeEclipseCleanRunServer UP-TO-DATE
 :eclipse
 
 BUILD SUCCESSFUL
 
-Total time: 7.688 secs
+Total time: 9.442 secs

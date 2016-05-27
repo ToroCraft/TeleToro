@@ -3,7 +3,6 @@ package net.torocraft.teletoro.teletory;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Teleporter;
@@ -26,6 +25,7 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 		System.out.println("=================== placeInPortal  DIM[" + entityIn.dimension + "] WORLD_DIM[" + world.provider.getDimension() + "]");
 		this.placeInExistingPortal(entityIn, rotationYaw);
 	}
+
 
 	public static class PortalSearchState {
 
@@ -81,12 +81,26 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 		entity.motionX = entity.motionY = entity.motionZ = 0.0D;
 		entity.motionX = 4;
 
-		if (entity instanceof EntityPlayerMP) {
-			((EntityPlayerMP) entity).playerNetServerHandler.setPlayerLocation(x, y, z, 90, 0);
-		} else {
-			entity.setLocationAndAngles(x, y, z, 90, 0);
-		}
+		entity.setPositionAndUpdate(x, y, z);
 
+		/*
+		 * if (entity instanceof EntityPlayerMP) {
+		 * 
+		 * 
+		 * 
+		 * 
+		 * entity.setLocationAndAngles(x, y, z, yaw, pitch);
+		 * entitylivingbase.fallDistance = 0.0F;
+		 * 
+		 * 
+		 * ((EntityPlayerMP) entity).playerLocation = new BlockPos(0,0,90);
+		 * ((EntityPlayerMP) entity).player
+		 * 
+		 * ((EntityPlayerMP) entity).playerNetServerHandler.setPlayerLocation(x,
+		 * y, z, 90, 0);
+		 * 
+		 * } else { entity.setLocationAndAngles(x, y, z, 90, 0); }
+		 */
 		return true;
 	}
 

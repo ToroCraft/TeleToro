@@ -1,20 +1,19 @@
 package net.torocraft.teletoro.teletory;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.LongHashMap;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
 
@@ -32,12 +31,16 @@ public class TeletoryTeleporter extends Teleporter {
 	/** A private Random() function in Teleporter */
 	private final Random random;
 	/** Stores successful portal placement locations for rapid lookup. */
-	private final LongHashMap destinationCoordinateCache = new LongHashMap();
+	// private final LongHashMap destinationCoordinateCache = new LongHashMap();
+
+	private final Long2ObjectMap<Teleporter.PortalPosition> destinationCoordinateCache = new Long2ObjectOpenHashMap(4096);
+
 	/**
 	 * A list of valid keys for the destinationCoordainteCache. These are based
 	 * on the X & Z of the players initial location.
 	 */
-	private final List destinationCoordinateKeys = com.google.common.collect.Lists.newArrayList();
+	// private final List destinationCoordinateKeys =
+	// com.google.common.collect.Lists.newArrayList();
 	// private static final String __OBFID = "CL_00000153";
 
 	public TeletoryTeleporter(WorldServer worldIn) {
@@ -80,7 +83,7 @@ public class TeletoryTeleporter extends Teleporter {
 
 			if (world.provider.getDimension() == Teletory.DIMID) {
 
-				longXZPair = ChunkCoordIntPair.chunkXZ2Int(MathHelper.floor_double(entity.posX), MathHelper.floor_double(entity.posZ));
+				longXZPair = ChunkPos.chunkXZ2Int(MathHelper.floor_double(entity.posX), MathHelper.floor_double(entity.posZ));
 
 				xEntity = entity.posX / TRAVEL_FACTOR;
 				yEntity = entity.posY;
@@ -98,7 +101,7 @@ public class TeletoryTeleporter extends Teleporter {
 				xSearch = MathHelper.floor_double(xEntity);
 				zSearch = MathHelper.floor_double(zEntity);
 
-				longXZPair = ChunkCoordIntPair.chunkXZ2Int(xSearch, zSearch);
+				longXZPair = ChunkPos.chunkXZ2Int(xSearch, zSearch);
 			}
 
 			System.out.println("search location x[" + xSearch + "] z[" + zSearch + "]");
@@ -128,7 +131,7 @@ public class TeletoryTeleporter extends Teleporter {
 	}
 
 	private void readCachedPortal(PortalSearchState search, long longXZPair) {
-		Teleporter.PortalPosition portalposition = (Teleporter.PortalPosition) this.destinationCoordinateCache.getValueByKey(longXZPair);
+		Teleporter.PortalPosition portalposition = destinationCoordinateCache.get(longXZPair);
 		search.distance = 0.0D;
 		search.portalPos = portalposition;
 		portalposition.lastUpdateTime = world.getTotalWorldTime();
@@ -189,15 +192,20 @@ public class TeletoryTeleporter extends Teleporter {
 
 		entity.motionX = entity.motionY = entity.motionZ = 0.0D;
 
-		entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
+		// entity.setLocationAndAngles(x, y, z, entity.rotationYaw,
+		// entity.rotationPitch);
 
-		if (entity instanceof EntityPlayerMP) {
-			System.out.println("EntityPlayerMP");
-			((EntityPlayerMP) entity).playerNetServerHandler.setPlayerLocation(x, y, z, entity.rotationYaw, entity.rotationPitch);
-		} else {
-			System.out.println("Not EntityPlayerMP");
-			entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
-		}
+		entity.setPositionAndUpdate(x, y, z);
+
+		/*
+		 * if (entity instanceof EntityPlayerMP) {
+		 * System.out.println("EntityPlayerMP"); ((EntityPlayerMP)
+		 * entity).playerNetServerHandler.setPlayerLocation(x, y, z,
+		 * entity.rotationYaw, entity.rotationPitch); } else {
+		 * System.out.println("Not EntityPlayerMP");
+		 * entity.setLocationAndAngles(x, y, z, entity.rotationYaw,
+		 * entity.rotationPitch); }
+		 */
 
 	}
 
@@ -244,6 +252,7 @@ public class TeletoryTeleporter extends Teleporter {
 			z = (double) (search.portalPos).getZ() + 0.5D;
 
 			x += (double) ((float) rotatedPortalDirection.getFrontOffsetX() * f6 + (float) portalDirection.getFrontOffsetX() * f1);
+
 			z += (double) ((float) rotatedPortalDirection.getFrontOffsetZ() * f6 + (float) portalDirection.getFrontOffsetZ() * f1);
 
 			float f2 = 0.0F;
@@ -305,8 +314,8 @@ public class TeletoryTeleporter extends Teleporter {
 
 	private void cachePortalLocation(PortalSearchState search) {
 		if (search.notCached) {
-			this.destinationCoordinateCache.add(search.longXZPair, new Teleporter.PortalPosition(search.portalPos, this.world.getTotalWorldTime()));
-			this.destinationCoordinateKeys.add(Long.valueOf(search.longXZPair));
+			this.destinationCoordinateCache.put(search.longXZPair, new Teleporter.PortalPosition(search.portalPos, this.world.getTotalWorldTime()));
+
 		}
 	}
 
@@ -315,7 +324,7 @@ public class TeletoryTeleporter extends Teleporter {
 	}
 
 	private boolean portalIsCached(long longIJPair) {
-		return this.destinationCoordinateCache.containsItem(longIJPair);
+		return this.destinationCoordinateCache.containsKey(Long.valueOf(longIJPair));
 	}
 
 	private boolean isBlocked(BlockPos pos) {
@@ -477,7 +486,7 @@ public class TeletoryTeleporter extends Teleporter {
 						i4 = yPos + k3;
 						j4 = zPos + (j3 - 1) * l2 - i3 * l5;
 						boolean flag = k3 < 0;
-						this.world.setBlockState(new BlockPos(l3, i4, j4), flag ? Blocks.end_bricks.getDefaultState() : Blocks.air.getDefaultState());
+						this.world.setBlockState(new BlockPos(l3, i4, j4), flag ? Blocks.END_BRICKS.getDefaultState() : Blocks.AIR.getDefaultState());
 					}
 				}
 			}
@@ -507,7 +516,7 @@ public class TeletoryTeleporter extends Teleporter {
 					y = yIn + l3;
 					z = zIn + (k3 - 1) * l2;
 					boolean flag1 = k3 == 0 || k3 == 3 || l3 == -1 || l3 == 3;
-					this.world.setBlockState(new BlockPos(x, y, z), flag1 ? Blocks.end_bricks.getDefaultState() : iblockstate, 2);
+					this.world.setBlockState(new BlockPos(x, y, z), flag1 ? Blocks.END_BRICKS.getDefaultState() : iblockstate, 2);
 				}
 			}
 
@@ -526,18 +535,20 @@ public class TeletoryTeleporter extends Teleporter {
 	 * called periodically to remove out-of-date portal locations from the cache
 	 * list. Argument par1 is a WorldServer.getTotalWorldTime() value.
 	 */
-	public void removeStalePortalLocations(long p_85189_1_) {
-		if (p_85189_1_ % 100L == 0L) {
-			Iterator iterator = this.destinationCoordinateKeys.iterator();
-			long j = p_85189_1_ - 600L;
+	/**
+	 * called periodically to remove out-of-date portal locations from the cache
+	 * list. Argument par1 is a WorldServer.getTotalWorldTime() value.
+	 */
+	public void removeStalePortalLocations(long worldTime) {
+		if (worldTime % 100L == 0L) {
+			long i = worldTime - 300L;
+			ObjectIterator<Teleporter.PortalPosition> objectiterator = this.destinationCoordinateCache.values().iterator();
 
-			while (iterator.hasNext()) {
-				Long olong = (Long) iterator.next();
-				Teleporter.PortalPosition portalposition = (Teleporter.PortalPosition) this.destinationCoordinateCache.getValueByKey(olong.longValue());
+			while (objectiterator.hasNext()) {
+				Teleporter.PortalPosition teleporter$portalposition = (Teleporter.PortalPosition) objectiterator.next();
 
-				if (portalposition == null || portalposition.lastUpdateTime < j) {
-					iterator.remove();
-					this.destinationCoordinateCache.remove(olong.longValue());
+				if (teleporter$portalposition == null || teleporter$portalposition.lastUpdateTime < i) {
+					objectiterator.remove();
 				}
 			}
 		}
