@@ -10,7 +10,7 @@ import net.minecraft.world.WorldServer;
 
 public class FallFromTeletoryTeleporter extends Teleporter {
 
-	private static final int FALL_DISTANCE = 12;
+	private static final int FALL_DISTANCE = 16;
 
 	private final WorldServer world;
 	private final Random random;
@@ -25,7 +25,6 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 		System.out.println("=================== placeInPortal  DIM[" + entityIn.dimension + "] WORLD_DIM[" + world.provider.getDimension() + "]");
 		this.placeInExistingPortal(entityIn, rotationYaw);
 	}
-
 
 	public static class PortalSearchState {
 
@@ -79,28 +78,11 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 		System.out.println("placing player at x[" + x + "] y[" + y + "] z[" + z + "]");
 
 		entity.motionX = entity.motionY = entity.motionZ = 0.0D;
-		entity.motionX = 4;
+		entity.motionX = 8;
+		entity.motionY = 0.5;
+		entity.fallDistance = 0;
 
-		entity.setPositionAndUpdate(x, y, z);
-
-		/*
-		 * if (entity instanceof EntityPlayerMP) {
-		 * 
-		 * 
-		 * 
-		 * 
-		 * entity.setLocationAndAngles(x, y, z, yaw, pitch);
-		 * entitylivingbase.fallDistance = 0.0F;
-		 * 
-		 * 
-		 * ((EntityPlayerMP) entity).playerLocation = new BlockPos(0,0,90);
-		 * ((EntityPlayerMP) entity).player
-		 * 
-		 * ((EntityPlayerMP) entity).playerNetServerHandler.setPlayerLocation(x,
-		 * y, z, 90, 0);
-		 * 
-		 * } else { entity.setLocationAndAngles(x, y, z, 90, 0); }
-		 */
+		entity.setLocationAndAngles(x, y, z, 270, -5);
 		return true;
 	}
 

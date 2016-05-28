@@ -9,6 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -19,7 +20,7 @@ import net.minecraft.world.WorldServer;
 
 public class TeletoryTeleporter extends Teleporter {
 
-	public static final double TRAVEL_FACTOR = 1;
+	public static final double TRAVEL_FACTOR = 32;
 
 	/*
 	 * fix portal cache support one block off problems remove portal particles
@@ -146,6 +147,8 @@ public class TeletoryTeleporter extends Teleporter {
 	private void searchForNearbyPortals(PortalSearchState search) {
 		BlockPos entityPos = new BlockPos(search.xSearch, world.getActualHeight() - 1, search.zSearch);
 
+		System.out.println("world height = " + world.getActualHeight());
+
 		System.out.println("commencing search x[" + search.xSearch + "] z[" + search.zSearch + "]");
 
 		for (int x = -PORTAL_SEARCH_RADIUS; x <= PORTAL_SEARCH_RADIUS; ++x) {
@@ -195,8 +198,17 @@ public class TeletoryTeleporter extends Teleporter {
 		// entity.setLocationAndAngles(x, y, z, entity.rotationYaw,
 		// entity.rotationPitch);
 
-		entity.setPositionAndUpdate(x, y, z);
-
+		/*
+		 * if (!world.isRemote && entity instanceof EntityPlayerMP) {
+		 * entity.fallDistance = 0.0F; entity.setPositionAndUpdate(x, y, z); }
+		 */
+		// if (!world.isRemote) {
+			if (entity instanceof EntityPlayerMP) {
+				((EntityPlayerMP) entity).connection.setPlayerLocation(x, y, z, entity.rotationYaw, entity.rotationPitch);
+			} else {
+				entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
+			}
+		// }
 		/*
 		 * if (entity instanceof EntityPlayerMP) {
 		 * System.out.println("EntityPlayerMP"); ((EntityPlayerMP)
@@ -207,88 +219,6 @@ public class TeletoryTeleporter extends Teleporter {
 		 * entity.rotationPitch); }
 		 */
 
-	}
-
-	private void handleFoundPortal_OriginalWithBug(Entity entity, float rotationYaw, PortalSearchState search) {
-		cachePortalLocation(search);
-
-		double x = (double) (search.portalPos).getX() + 0.5D;
-		double y = (double) (search.portalPos).getY() + 0.5D;
-		double z = (double) (search.portalPos).getZ() + 0.5D;
-
-		EnumFacing portalDirection = determinePortalDirection(search);
-		EnumFacing entityDirection = entity.getTeleportDirection();
-
-		if (portalDirection != null) {
-
-			BlockPos inFrontOfPortal = (search.portalPos).offset(portalDirection);
-			boolean fontIsBlocked = isBlocked(inFrontOfPortal);
-
-			EnumFacing rotatedPortalDirection = portalDirection.rotateYCCW();
-			boolean frontLeftIsBlocked = isBlocked(inFrontOfPortal.offset(rotatedPortalDirection));
-
-			if (frontLeftIsBlocked && fontIsBlocked) {
-				search.portalPos = (search.portalPos).offset(rotatedPortalDirection);
-				portalDirection = portalDirection.getOpposite();
-				rotatedPortalDirection = rotatedPortalDirection.getOpposite();
-				BlockPos blockpos3 = (search.portalPos).offset(portalDirection);
-				fontIsBlocked = isBlocked(blockpos3);
-				frontLeftIsBlocked = isBlocked(blockpos3.offset(rotatedPortalDirection));
-			}
-
-			float f6 = 0.5F;
-			float f1 = 0.5F;
-
-			if (!frontLeftIsBlocked && fontIsBlocked) {
-				f6 = 1.0F;
-			} else if (frontLeftIsBlocked && !fontIsBlocked) {
-				f6 = 0.0F;
-			} else if (frontLeftIsBlocked) {
-				f1 = 0.0F;
-			}
-
-			x = (double) (search.portalPos).getX() + 0.5D;
-			y = (double) (search.portalPos).getY() + 0.5D;
-			z = (double) (search.portalPos).getZ() + 0.5D;
-
-			x += (double) ((float) rotatedPortalDirection.getFrontOffsetX() * f6 + (float) portalDirection.getFrontOffsetX() * f1);
-
-			z += (double) ((float) rotatedPortalDirection.getFrontOffsetZ() * f6 + (float) portalDirection.getFrontOffsetZ() * f1);
-
-			float f2 = 0.0F;
-			float f3 = 0.0F;
-			float f4 = 0.0F;
-			float f5 = 0.0F;
-
-			if (entityDirection != null && portalDirection == entityDirection) {
-				f2 = 1.0F;
-				f3 = 1.0F;
-			} else if (entityDirection != null && portalDirection == entityDirection.getOpposite()) {
-				f2 = -1.0F;
-				f3 = -1.0F;
-			} else if (entityDirection != null && portalDirection == entityDirection.rotateY()) {
-				f4 = 1.0F;
-				f5 = -1.0F;
-			} else {
-				f4 = -1.0F;
-				f5 = 1.0F;
-			}
-
-			double motionX = entity.motionX;
-			double motionZ = entity.motionZ;
-
-			entity.motionX = motionX * (double) f2 + motionZ * (double) f5;
-			entity.motionZ = motionX * (double) f4 + motionZ * (double) f3;
-
-			if (entityDirection != null) {
-				entity.rotationYaw = rotationYaw - (float) (entityDirection.getHorizontalIndex() * 90) + (float) (portalDirection.getHorizontalIndex() * 90);
-			}
-
-		} else {
-			entity.motionX = entity.motionY = entity.motionZ = 0.0D;
-		}
-
-		entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
 	}
 
 	private EnumFacing determinePortalDirection(PortalSearchState search) {
@@ -331,7 +261,30 @@ public class TeletoryTeleporter extends Teleporter {
 		return !world.isAirBlock(pos) || !world.isAirBlock(pos.up());
 	}
 
+	@Override
 	public boolean makePortal(Entity e) {
+		if (e.dimension == Teletory.DIMID) {
+			return makePortalOnPlatform(e);
+		}
+		return makePortalOnExistingGround(e);
+	}
+
+	public boolean makePortalOnPlatform(Entity e) {
+
+		PortalSearchState search = new PortalSearchState(e, world);
+
+		int x = search.xSearch;
+		int y = 10;
+		int z = search.zSearch;
+
+		buildPortalFloor(x, y, z);
+
+		placePortalBlocks(z, x, y, 1, 0);
+
+		return true;
+	}
+
+	public boolean makePortalOnExistingGround(Entity e) {
 
 		PortalSearchState search = new PortalSearchState(e, world);
 
@@ -495,6 +448,18 @@ public class TeletoryTeleporter extends Teleporter {
 		placePortalBlocks(zPos, xPos, yPos, l5, l2);
 
 		return true;
+	}
+
+	private void buildPortalFloor(int x, int y, int z) {
+		System.out.println("Building portal floor");
+		int size = 10;
+		int y1 = y - 1;
+
+		for (int x1 = -size / 2; x1 < size / 2; x1++) {
+			for (int z1 = -size / 2; z1 < size / 2; z1++) {
+				world.setBlockState(new BlockPos(x1 + x, y1, z1 + z), Blocks.END_BRICKS.getDefaultState());
+			}
+		}
 	}
 
 	private void placePortalBlocks(int zIn, int xIn, int yIn, int l5, int l2) {

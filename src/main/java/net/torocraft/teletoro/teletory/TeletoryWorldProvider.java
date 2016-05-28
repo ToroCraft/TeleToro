@@ -1,24 +1,21 @@
 package net.torocraft.teletoro.teletory;
 
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.BiomeProviderSingle;
 import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TeletoryWorldProvider extends WorldProvider {
-
-	@Override
-	public void registerWorldChunkManager() {
-		this.worldChunkMgr = new BiomeProviderSingle(BiomeGenBase.biomeRegistry.getObject(new ResourceLocation("desert")));
-		this.isHellWorld = true;
-		this.hasNoSky = false;
-		// this.dimensionId = DIMID;
-	}
+	/*
+	 * @Override public void registerWorldChunkManager() { this.worldChunkMgr =
+	 * new BiomeProviderSingle(BiomeGenBase.biomeRegistry.getObject(new
+	 * ResourceLocation("desert"))); this.isHellWorld = true; this.hasNoSky =
+	 * false; // this.dimensionId = DIMID;
+	 * 
+	 * }
+	 */
 
 	public DimensionType getDimensionType() {
 		return Teletory.type;
@@ -32,7 +29,7 @@ public class TeletoryWorldProvider extends WorldProvider {
 
 	@Override
 	public IChunkGenerator createChunkGenerator() {
-		return new TeletoryChunkProvider(this.worldObj, this.worldObj.getSeed() - 13142);
+		return new TeletoryChunkProvider(this.worldObj);
 	}
 
 	@Override

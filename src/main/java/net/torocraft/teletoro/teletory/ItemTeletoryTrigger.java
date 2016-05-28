@@ -21,16 +21,11 @@ public class ItemTeletoryTrigger extends Item {
 		super();
 		this.maxStackSize = 1;
 		setMaxDamage(64);
-		setCreativeTab(CreativeTabs.tabTools);
+		setCreativeTab(CreativeTabs.TOOLS);
 	}
 
 	@Override
-	public EnumActionResult onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, BlockPos pos, EnumHand hand, EnumFacing side, float par8, float par9, float par10)
-	// public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer
-	// par2EntityPlayer, World par3World, int par4, int par5, int par6, int
-	// par7, float par8, float par9, float par10)
-	{
-
+	public EnumActionResult onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, BlockPos pos, EnumHand hand, EnumFacing side, float par8, float par9, float par10) {
 		int par4 = pos.getX();
 		int par5 = pos.getY();
 		int par6 = pos.getZ();
@@ -59,9 +54,11 @@ public class ItemTeletoryTrigger extends Item {
 			return EnumActionResult.FAIL;
 		}
 		Block i1 = getBlock(par3World, par4, par5, par6);
-		if (i1 == Blocks.air) {
-			par3World.playSound(par2EntityPlayer, new BlockPos(par4, par5, par6), SoundEvents.item_flintandsteel_use, SoundCategory.BLOCKS, 1.0F, itemRand.nextFloat() * 0.4F + 0.8F);
-			Teletory.portal.tryToCreatePortal(par3World, par4, par5, par6);
+		if (i1 == Blocks.AIR) {
+			par3World.playSound(par2EntityPlayer, new BlockPos(par4, par5, par6), SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0F, itemRand.nextFloat() * 0.4F + 0.8F);
+			boolean created = Teletory.portal.tryToCreatePortal(par3World, par4, par5, par6);
+
+			System.out.println("try to create portal at " + new BlockPos(par4, par5, par6) + " portal created = " + created);
 		}
 		par1ItemStack.damageItem(1, par2EntityPlayer);
 		return EnumActionResult.SUCCESS;
