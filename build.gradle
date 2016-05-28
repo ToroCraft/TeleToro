@@ -20,12 +20,12 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 */
-version = "1.0"
-group= "com.yourname.modid" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "modid"
+version = "1.1"
+group= "net.torocraft.teletoro" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "teletoro"
 
 minecraft {
-    version = "1.9.4-12.17.0.1917-1.9.4"
+    version = "1.9.4-12.17.0.1922-1.9.4"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.

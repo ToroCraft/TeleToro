@@ -4,7 +4,8 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry sourcepath="/home/frodare/.gradle/caches/minecraft/net/minecraftforge/forge/1.9.4-12.17.0.1917-1.9.4/snapshot/20160518/forgeSrc-1.9.4-12.17.0.1917-1.9.4-sources.jar" kind="lib" path="/home/frodare/.gradle/caches/minecraft/net/minecraftforge/forge/1.9.4-12.17.0.1917-1.9.4/snapshot/20160518/forgeSrc-1.9.4-12.17.0.1917-1.9.4.jar"/>
+	<classpathentry sourcepath="/home/frodare/.gradle/caches/minecraft/net/minecraftforge/forge/1.9.4-12.17.0.1922-1.9.4/snapshot/20160518/forgeSrc-1.9.4-12.17.0.1922-1.9.4-sources.jar" kind="lib" path="/home/frodare/.gradle/caches/minecraft/net/minecraftforge/forge/1.9.4-12.17.0.1922-1.9.4/snapshot/20160518/forgeSrc-1.9.4-12.17.0.1922-1.9.4.jar"/>
+	<classpathentry sourcepath="/home/frodare/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.1/a2926c057ca3b662b9db194c869bdbe7d3bb8aef/jsr305-3.0.1-sources.jar" kind="lib" path="/home/frodare/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.1/f7be08ec23c21485b9b5a1cf1654c2ec8c58168d/jsr305-3.0.1.jar"/>
 	<classpathentry sourcepath="/home/frodare/.gradle/caches/modules-2/files-2.1/com.mojang/netty/1.6/cd01cc3788bac1b1eb9cf2cda02fc7698a5ca1cc/netty-1.6-sources.jar" kind="lib" path="/home/frodare/.gradle/caches/modules-2/files-2.1/com.mojang/netty/1.6/4b75825a06139752bd800d9e29c5fd55b8b1b1e4/netty-1.6.jar"/>
 	<classpathentry sourcepath="/home/frodare/.gradle/caches/modules-2/files-2.1/oshi-project/oshi-core/1.1/1ec1ab1e6ac5a1572edfd0dd9ac95e83684b8a65/oshi-core-1.1-sources.jar" kind="lib" path="/home/frodare/.gradle/caches/modules-2/files-2.1/oshi-project/oshi-core/1.1/9ddf7b048a8d701be231c0f4f95fd986198fd2d8/oshi-core-1.1.jar"/>
 	<classpathentry sourcepath="/home/frodare/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/3.4.0/2f42653596d0044f0ab456620cba54c9cf53c5ca/jna-3.4.0-sources.jar" kind="lib" path="/home/frodare/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/3.4.0/803ff252fedbd395baffd43b37341dc4a150a554/jna-3.4.0.jar"/>
@@ -57,11 +58,10 @@
 	<classpathentry kind="lib" path="/home/frodare/.gradle/caches/modules-2/files-2.1/net.java.jinput/jinput-platform/2.0.5/7ff832a6eb9ab6a767f1ade2b548092d0fa64795/jinput-platform-2.0.5-natives-linux.jar"/>
 	<classpathentry kind="lib" path="/home/frodare/.gradle/caches/modules-2/files-2.1/net.java.jinput/jinput-platform/2.0.5/385ee093e01f587f30ee1c8a2ee7d408fd732e16/jinput-platform-2.0.5-natives-windows.jar"/>
 	<classpathentry kind="lib" path="/home/frodare/.gradle/caches/modules-2/files-2.1/net.java.jinput/jinput-platform/2.0.5/53f9c919f34d2ca9de8c51fc4e1e8282029a9232/jinput-platform-2.0.5-natives-osx.jar"/>
-	<classpathentry kind="lib" path="/home/frodare/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/2.0.1/516c03b21d50a644d538de0f0369c620989cd8f0/jsr305-2.0.1.jar"/>
 	<classpathentry kind="lib" path="/home/frodare/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl-platform/2.9.4-nightly-20150209/b84d5102b9dbfabfeb5e43c7e2828d98a7fc80e0/lwjgl-platform-2.9.4-nightly-20150209-natives-windows.jar"/>
 	<classpathentry kind="lib" path="/home/frodare/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl-platform/2.9.4-nightly-20150209/931074f46c795d2f7b30ed6395df5715cfd7675b/lwjgl-platform-2.9.4-nightly-20150209-natives-linux.jar"/>
 	<classpathentry kind="lib" path="/home/frodare/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl-platform/2.9.4-nightly-20150209/bcab850f8f487c3f4c4dbabde778bb82bd1a40ed/lwjgl-platform-2.9.4-nightly-20150209-natives-osx.jar"/>
 	<classpathentry kind="lib" path="/home/frodare/.gradle/caches/minecraft/deobfedDeps/compileDummy.jar"/>
 	<classpathentry kind="lib" path="/home/frodare/.gradle/caches/minecraft/deobfedDeps/providedDummy.jar"/>
-	<classpathentry kind="lib" path="/home/frodare/.gradle/caches/minecraft/net/minecraftforge/forge/1.9.4-12.17.0.1917-1.9.4/start"/>
+	<classpathentry kind="lib" path="/home/frodare/.gradle/caches/minecraft/net/minecraftforge/forge/1.9.4-12.17.0.1922-1.9.4/start"/>
 </classpath>

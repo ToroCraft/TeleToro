@@ -14,12 +14,30 @@ public class TeleToroUtil {
 
 	public static void setInvulnerableDimensionChange(EntityPlayerMP thePlayer) {
 		try {
-			System.out.println("setting invulnerableDimensionChange");
-			Field invulnerableDimensionChange = thePlayer.getClass().getDeclaredField("invulnerableDimensionChange");
+
+			Field invulnerableDimensionChange = getFieldFromPlayer("field_184851_cj");
+
+			if (invulnerableDimensionChange == null) {
+				invulnerableDimensionChange = getFieldFromPlayer("invulnerableDimensionChange");
+			}
+
+			if (invulnerableDimensionChange == null) {
+				throw new RuntimeException("invulnerableDimensionChange field not found in " + EntityPlayerMP.class.getName());
+			}
+
 			invulnerableDimensionChange.setAccessible(true);
 			invulnerableDimensionChange.setBoolean(thePlayer, true);
 		} catch (Exception e) {
 			throw new RuntimeException("Unable to set invulnerableDimensionChange via reflection", e);
 		}
 	}
+
+	public static Field getFieldFromPlayer(String name) {
+		try {
+			return EntityPlayerMP.class.getDeclaredField(name);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 }
