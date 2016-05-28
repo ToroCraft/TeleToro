@@ -116,13 +116,32 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 		if (axis == EnumFacing.Axis.X) {
 			BlockAbstractPortal.Size sizer = getSizer(worldIn, pos, EnumFacing.Axis.X);
 
-			if (!sizer.isValid() || sizer.portalBlockCount < sizer.width * sizer.height) {
+			// if (!sizer.isValid() || sizer.portalBlockCount < sizer.width *
+			// sizer.height) {
+			if (!sizer.isValid()) {
+
+				// System.out.println("Portal collapse valid[" + sizer.isValid()
+				// + "] sizer.portalBlockCount[" + sizer.portalBlockCount + "] <
+				// sizer.width[" + sizer.width + "] * sizer.height[" +
+				// sizer.height + "] ["
+				// + (sizer.portalBlockCount < sizer.width * sizer.height) +
+				// "]");
+
 				worldIn.setBlockState(pos, Blocks.AIR.getDefaultState());
 			}
 		} else if (axis == EnumFacing.Axis.Z) {
 			BlockAbstractPortal.Size sizer = getSizer(worldIn, pos, EnumFacing.Axis.Z);
 
-			if (!sizer.isValid() || sizer.portalBlockCount < sizer.width * sizer.height) {
+			// if (!sizer.isValid() || sizer.portalBlockCount < sizer.width *
+			// sizer.height) {
+			if (!sizer.isValid()) {
+
+				// System.out.println("Portal collapse valid[" + sizer.isValid()
+				// + "] sizer.portalBlockCount[" + sizer.portalBlockCount + "] <
+				// sizer.width[" + sizer.width + "] * sizer.height[" +
+				// sizer.height + "] ["
+				// + (sizer.portalBlockCount < sizer.width * sizer.height) +
+				// "]");
 				worldIn.setBlockState(pos, Blocks.AIR.getDefaultState());
 			}
 		}
@@ -317,6 +336,8 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 			this.world = worldIn;
 			this.axis = axis;
 
+			// System.out.println("*** new Size " + pos + " " + axis);
+
 			if (axis == EnumFacing.Axis.X) {
 				this.leftDir = EnumFacing.EAST;
 				this.rightDir = EnumFacing.WEST;
@@ -331,6 +352,8 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 
 			int i = this.getDistanceUntilEdge(pos, this.leftDir) - 1;
 
+			// System.out.println(pos + " distance:" + i);
+
 			if (i >= 0) {
 				this.bottomLeft = pos.offset(this.leftDir, i);
 				this.width = this.getDistanceUntilEdge(this.bottomLeft, this.rightDir);
@@ -344,6 +367,9 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 			if (this.bottomLeft != null) {
 				this.height = this.calculatePortalHeight();
 			}
+
+			// System.out.println("bottomLeft[" + bottomLeft + "] height[" +
+			// height + "] width[" + width + "]");
 		}
 
 		protected int getDistanceUntilEdge(BlockPos p_180120_1_, EnumFacing p_180120_2_) {
@@ -378,11 +404,14 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 					Block block = this.world.getBlockState(blockpos).getBlock();
 
 					if (!this.isEmptyBlock(block)) {
+						// System.out.println("Block is not empty");
 						break label24;
 					}
 
 					if (block == Teletory.portal) {
 						++this.portalBlockCount;
+						// System.out.println("increment block count [" +
+						// portalBlockCount + "]");
 					}
 
 					if (i == 0) {
@@ -430,7 +459,9 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 		}
 
 		public boolean isValid() {
-			return this.bottomLeft != null && this.width >= 2 && this.width <= 21 && this.height >= 3 && this.height <= 21;
+			boolean valid = this.bottomLeft != null && this.width >= 2 && this.width <= 21 && this.height >= 3 && this.height <= 21;
+			// System.out.println("isValid() " + valid);
+			return valid;
 		}
 
 		public void placePortalBlocks() {

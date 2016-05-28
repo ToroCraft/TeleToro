@@ -77,7 +77,7 @@ public class Teletory {
 
 	private void hurtPlayer(Entity entity) {
 		entity.fallDistance = 0.0F;
-		entity.attackEntityFrom(DamageSource.fall, 2.5f);
+		entity.attackEntityFrom(DamageSource.fall, 3f);
 
 		if (entity.worldObj.rand.nextFloat() < 0.025F && entity.worldObj.getGameRules().getBoolean("doMobSpawning")) {
 			EntityEndermite entityendermite = new EntityEndermite(entity.worldObj);
@@ -96,16 +96,24 @@ public class Teletory {
 
 	@SubscribeEvent
 	public void useFlintAndSteel(RightClickBlock event) {
-		if (event.getItemStack() == null || event.getItemStack().getItem() != Items.STICK) {
+		if (event.getItemStack() == null || event.getItemStack().getItem() != Items.FLINT_AND_STEEL) {
 			return;
 		}
+
+
 		BlockPos pos = event.getPos();
 
 		int par4 = pos.getX();
 		int par5 = pos.getY();
 		int par6 = pos.getZ();
 
-		int par7 = event.getFace().getIndex();
+		int par7;
+
+		if (event.getFace() == null) {
+			par7 = 0;
+		} else {
+			par7 = event.getFace().getIndex();
+		}
 
 		if (par7 == 0) {
 			par5--;
@@ -128,35 +136,13 @@ public class Teletory {
 
 		EntityPlayer par2EntityPlayer = event.getEntityPlayer();
 
-		// Block i1 = getBlock(event.getWorld(), par4, par5, par6);
-		// if (i1 == Blocks.AIR) {
-
 		Block i1 = getBlock(event.getWorld(), par4, par5, par6);
 		if (i1 == Blocks.AIR) {
-			// event.getWorld().playSound(par2EntityPlayer, new BlockPos(par4,
-			// par5, par6), SoundEvents.ITEM_FLINTANDSTEEL_USE,
-			// SoundCategory.BLOCKS, 1.0F, itemRand.nextFloat() * 0.4F + 0.8F);
 			boolean created = Teletory.portal.tryToCreatePortal(event.getWorld(), par4, par5, par6);
-
-			System.out.println("try to create portal at " + new BlockPos(par4, par5, par6) + " portal created = " + created);
-
 			if (created) {
 				event.setCanceled(true);
 			}
 		}
-
-	// boolean created = Teletory.portal.tryToCreatePortal(event.getWorld(),
-		// par4, par5, par6);
-
-
-		// System.out.println("try to create portal at " + new BlockPos(par4,
-		// par5, par6) + " portal created = " + created);
-
-		// }
-		// par1ItemStack.damageItem(1, par2EntityPlayer);
-		// return EnumActionResult.SUCCESS;
-
-
 
 	}
 

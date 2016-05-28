@@ -12,6 +12,18 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class TeleToroMod {
 
 	
+	/*
+	 * - portal texture
+	 * 
+	 * - enderblock
+	 * 
+	 * - remove weather from teletory
+	 * 
+	 * 
+	 * 
+	 * 
+	 */
+
 	public static final String MODID = "teletoro";
 	public static final String VERSION = "1.0";
 	public static final String MODNAME = "TeleToro";
