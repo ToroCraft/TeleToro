@@ -19,7 +19,7 @@ public class TeleToroMod {
 	 * 
 	 * - remove weather from teletory
 	 * 
-	 * 
+	 * - remove sound?
 	 * 
 	 * 
 	 */

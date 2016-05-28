@@ -408,7 +408,7 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 						break label24;
 					}
 
-					if (block == Teletory.portal) {
+					if (block == BlockTeletoryPortal.INSTANCE) {
 						++this.portalBlockCount;
 						// System.out.println("increment block count [" +
 						// portalBlockCount + "]");
@@ -455,7 +455,7 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 
 			// return blockIn.is
 
-			return getMaterial(blockIn) == Material.AIR || blockIn == Blocks.FIRE || blockIn == Teletory.portal;
+			return getMaterial(blockIn) == Material.AIR || blockIn == Blocks.FIRE || blockIn == BlockTeletoryPortal.INSTANCE;
 		}
 
 		public boolean isValid() {
@@ -469,7 +469,7 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 				BlockPos blockpos = this.bottomLeft.offset(this.rightDir, i);
 
 				for (int j = 0; j < this.height; ++j) {
-					this.world.setBlockState(blockpos.up(j), Teletory.portal.getDefaultState().withProperty(BlockAbstractPortal.AXIS, this.axis), 2);
+					this.world.setBlockState(blockpos.up(j), BlockTeletoryPortal.INSTANCE.getDefaultState().withProperty(BlockAbstractPortal.AXIS, this.axis), 2);
 				}
 			}
 		}

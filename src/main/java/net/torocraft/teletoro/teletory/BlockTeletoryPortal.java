@@ -5,16 +5,42 @@ import static net.torocraft.teletoro.TeleToroUtil.getBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.torocraft.teletoro.TeleToroMod;
 import net.torocraft.teletoro.TeleToroUtil;
+import net.torocraft.teletoro.blocks.BlockEnder;
 
 public class BlockTeletoryPortal extends BlockAbstractPortal {
+
+	public static BlockTeletoryPortal INSTANCE;
+
+	public static Item ITEM_INSTANCE;
+
+	// public static final Block FRAME_BLOCK = BlockEnder.INSTANCE;
+
+	public static final String NAME = "teletoryPortalBlock";
+
+	public static void init() {
+		INSTANCE = (BlockTeletoryPortal) new BlockTeletoryPortal().setUnlocalizedName(NAME);
+
+		GameRegistry.registerBlock(INSTANCE, NAME);
+		ITEM_INSTANCE = GameRegistry.findItem(TeleToroMod.MODID, NAME);
+	}
+
+	public static void registerRenders() {
+		ModelResourceLocation model = new ModelResourceLocation(TeleToroMod.MODID + ":" + NAME, "inventory");
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(ITEM_INSTANCE, 0, model);
+	}
 
 	@Override
 	public void onEntityCollidedWithBlock(World par1World, BlockPos pos, IBlockState state, Entity par5Entity) {
@@ -60,12 +86,20 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 	public boolean tryToCreatePortal(World par1World, int par2, int par3, int par4) {
 		byte b0 = 0;
 		byte b1 = 0;
-		if (getBlock(par1World, par2 - 1, par3, par4) == Blocks.END_BRICKS || getBlock(par1World, par2 + 1, par3, par4) == Blocks.END_BRICKS) {
+		if (getBlock(par1World, par2 - 1, par3, par4) == BlockEnder.INSTANCE || getBlock(par1World, par2 + 1, par3, par4) == BlockEnder.INSTANCE) {
 			b0 = 1;
 		}
-		if (getBlock(par1World, par2, par3, par4 - 1) == Blocks.END_BRICKS || getBlock(par1World, par2, par3, par4 + 1) == Blocks.END_BRICKS) {
+		if (getBlock(par1World, par2, par3, par4 - 1) == BlockEnder.INSTANCE || getBlock(par1World, par2, par3, par4 + 1) == BlockEnder.INSTANCE) {
 			b1 = 1;
 		}
+
+		System.out.println(getBlock(par1World, par2 - 1, par3, par4));
+		System.out.println(getBlock(par1World, par2 + 1, par3, par4));
+		System.out.println(getBlock(par1World, par2, par3, par4 - 1));
+		System.out.println(getBlock(par1World, par2, par3, par4 + 1));
+
+		System.out.println("b0[" + b0 + "] b1[" + b1 + "]");
+
 		if (b0 == b1) {
 			return false;
 		} else {
@@ -81,7 +115,7 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 					if (l != -1 && l != 2 || i1 != -1 && i1 != 3) {
 						Block j1 = getBlock(par1World, par2 + b0 * l, par3 + i1, par4 + b1 * l);
 						if (flag) {
-							if (j1 != Blocks.END_BRICKS) {
+							if (j1 != BlockEnder.INSTANCE) {
 								return false;
 							}
 						}
@@ -111,7 +145,7 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 
 		@Override
 		public Block getFrameBlock() {
-			return Blocks.END_BRICKS;
+			return BlockEnder.INSTANCE;
 		}
 
 	}

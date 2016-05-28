@@ -3,6 +3,8 @@ package net.torocraft.teletoro;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.torocraft.teletoro.blocks.BlockEnder;
+import net.torocraft.teletoro.teletory.BlockTeletoryPortal;
 
 public class ClientProxy extends CommonProxy {
 
@@ -14,7 +16,8 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void init(FMLInitializationEvent e) {
         super.init(e);
-
+		BlockTeletoryPortal.registerRenders();
+		BlockEnder.registerRenders();
     }
 
     @Override

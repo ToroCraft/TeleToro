@@ -3,15 +3,12 @@ package net.torocraft.teletoro.teletory;
 import static net.torocraft.teletoro.TeleToroUtil.getBlock;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityEndermite;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
@@ -23,8 +20,6 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBloc
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
 import net.torocraft.teletoro.TeleToroUtil;
 
 public class Teletory {
@@ -32,13 +27,14 @@ public class Teletory {
 	public static int DIMID = 16;
 	public static DimensionType type = DimensionType.register("teletory", "_teletory", DIMID, TeletoryWorldProvider.class, false);
 
-	public static BlockTeletoryPortal portal;
-	public static Item trigger;
+	// public static BlockTeletoryPortal portal;
+	// public static Item trigger;
 
 	static {
 
-		portal = (BlockTeletoryPortal) (new BlockTeletoryPortal().setUnlocalizedName("teletory_portal"));
-		trigger = new ItemTeletoryTrigger().setUnlocalizedName("teletory_trigger");
+
+		// trigger = new
+		// ItemTeletoryTrigger().setUnlocalizedName("teletory_trigger");
 
 		// trigger = Items.FLINT_AND_STEEL;
 
@@ -47,14 +43,8 @@ public class Teletory {
 
 	public void init(FMLInitializationEvent event) {
 
-		GameRegistry.registerBlock(portal, "teletory_portal");
-		GameRegistry.registerItem(trigger, "teletory_trigger");
-
 		DimensionManager.registerDimension(DIMID, type);
 
-		if (event.getSide() == Side.CLIENT) {
-			Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(trigger, 0, new ModelResourceLocation("Teletory:teletory_trigger", "inventory"));
-		}
 
 	}
 
@@ -77,7 +67,7 @@ public class Teletory {
 
 	private void hurtPlayer(Entity entity) {
 		entity.fallDistance = 0.0F;
-		entity.attackEntityFrom(DamageSource.fall, 3f);
+		entity.attackEntityFrom(DamageSource.fall, 5f);
 
 		if (entity.worldObj.rand.nextFloat() < 0.025F && entity.worldObj.getGameRules().getBoolean("doMobSpawning")) {
 			EntityEndermite entityendermite = new EntityEndermite(entity.worldObj);
@@ -138,7 +128,8 @@ public class Teletory {
 
 		Block i1 = getBlock(event.getWorld(), par4, par5, par6);
 		if (i1 == Blocks.AIR) {
-			boolean created = Teletory.portal.tryToCreatePortal(event.getWorld(), par4, par5, par6);
+			System.out.println("tryToCreatePortal");
+			boolean created = BlockTeletoryPortal.INSTANCE.tryToCreatePortal(event.getWorld(), par4, par5, par6);
 			if (created) {
 				event.setCanceled(true);
 			}

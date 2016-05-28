@@ -17,6 +17,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
+import net.torocraft.teletoro.blocks.BlockEnder;
 
 public class TeletoryTeleporter extends Teleporter {
 
@@ -161,7 +162,7 @@ public class TeletoryTeleporter extends Teleporter {
 
 					if (isPortal(searchPos)) {
 
-						while (world.getBlockState(blockpos1 = searchPos.down()).getBlock() == Teletory.portal) {
+						while (world.getBlockState(blockpos1 = searchPos.down()).getBlock() == BlockTeletoryPortal.INSTANCE) {
 							searchPos = blockpos1;
 						}
 
@@ -224,19 +225,19 @@ public class TeletoryTeleporter extends Teleporter {
 	private EnumFacing determinePortalDirection(PortalSearchState search) {
 		EnumFacing portalDirection = null;
 
-		if (this.world.getBlockState((search.portalPos).west()).getBlock() == Teletory.portal) {
+		if (this.world.getBlockState((search.portalPos).west()).getBlock() == BlockTeletoryPortal.INSTANCE) {
 			portalDirection = EnumFacing.NORTH;
 		}
 
-		if (this.world.getBlockState((search.portalPos).east()).getBlock() == Teletory.portal) {
+		if (this.world.getBlockState((search.portalPos).east()).getBlock() == BlockTeletoryPortal.INSTANCE) {
 			portalDirection = EnumFacing.SOUTH;
 		}
 
-		if (this.world.getBlockState((search.portalPos).north()).getBlock() == Teletory.portal) {
+		if (this.world.getBlockState((search.portalPos).north()).getBlock() == BlockTeletoryPortal.INSTANCE) {
 			portalDirection = EnumFacing.EAST;
 		}
 
-		if (this.world.getBlockState((search.portalPos).south()).getBlock() == Teletory.portal) {
+		if (this.world.getBlockState((search.portalPos).south()).getBlock() == BlockTeletoryPortal.INSTANCE) {
 			portalDirection = EnumFacing.WEST;
 		}
 		return portalDirection;
@@ -250,7 +251,7 @@ public class TeletoryTeleporter extends Teleporter {
 	}
 
 	private boolean isPortal(BlockPos blockpos) {
-		return this.world.getBlockState(blockpos).getBlock() == Teletory.portal;
+		return this.world.getBlockState(blockpos).getBlock() == BlockTeletoryPortal.INSTANCE;
 	}
 
 	private boolean portalIsCached(long longIJPair) {
@@ -439,7 +440,7 @@ public class TeletoryTeleporter extends Teleporter {
 						i4 = yPos + k3;
 						j4 = zPos + (j3 - 1) * l2 - i3 * l5;
 						boolean flag = k3 < 0;
-						this.world.setBlockState(new BlockPos(l3, i4, j4), flag ? Blocks.END_BRICKS.getDefaultState() : Blocks.AIR.getDefaultState());
+						this.world.setBlockState(new BlockPos(l3, i4, j4), flag ? BlockEnder.INSTANCE.getDefaultState() : Blocks.AIR.getDefaultState());
 					}
 				}
 			}
@@ -451,13 +452,12 @@ public class TeletoryTeleporter extends Teleporter {
 	}
 
 	private void buildPortalFloor(int x, int y, int z) {
-		System.out.println("Building portal floor");
 		int size = 10;
 		int y1 = y - 1;
 
 		for (int x1 = -size / 2; x1 < size / 2; x1++) {
 			for (int z1 = -size / 2; z1 < size / 2; z1++) {
-				world.setBlockState(new BlockPos(x1 + x, y1, z1 + z), Blocks.END_BRICKS.getDefaultState());
+				world.setBlockState(new BlockPos(x1 + x, y1, z1 + z), Blocks.END_STONE.getDefaultState());
 			}
 		}
 	}
@@ -472,7 +472,7 @@ public class TeletoryTeleporter extends Teleporter {
 
 		System.out.println("x[" + xIn + "] y[" + yIn + "] z[" + zIn + "]  l5[" + l5 + "] l2[" + l2 + "]");
 
-		IBlockState iblockstate = Teletory.portal.getDefaultState().withProperty(BlockPortal.AXIS, l5 == 0 ? EnumFacing.Axis.Z : EnumFacing.Axis.X);
+		IBlockState iblockstate = BlockTeletoryPortal.INSTANCE.getDefaultState().withProperty(BlockPortal.AXIS, l5 == 0 ? EnumFacing.Axis.Z : EnumFacing.Axis.X);
 
 		for (j3 = 0; j3 < 4; ++j3) {
 			for (k3 = 0; k3 < 4; ++k3) {
@@ -481,7 +481,7 @@ public class TeletoryTeleporter extends Teleporter {
 					y = yIn + l3;
 					z = zIn + (k3 - 1) * l2;
 					boolean flag1 = k3 == 0 || k3 == 3 || l3 == -1 || l3 == 3;
-					this.world.setBlockState(new BlockPos(x, y, z), flag1 ? Blocks.END_BRICKS.getDefaultState() : iblockstate, 2);
+					this.world.setBlockState(new BlockPos(x, y, z), flag1 ? BlockEnder.INSTANCE.getDefaultState() : iblockstate, 2);
 				}
 			}
 

@@ -1,7 +1,7 @@
 {
     "textures": {
-        "particle": "blocks/portal",
-        "portal": "blocks/portal"
+        "particle": "teletoro:blocks/teletory_portal",
+        "portal": "teletoro:blocks/teletory_portal"
     },
     "elements": [
         {   "from": [ 6, 0, 0 ],

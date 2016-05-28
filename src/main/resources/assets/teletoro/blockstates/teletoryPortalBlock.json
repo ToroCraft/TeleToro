@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "axis=z": { "model": "teletoro:teletory_portal_ew" },
+        "axis=x": { "model": "teletoro:teletory_portal_ns" },
+		"inventory": { "model": "teletoro:teletory_portal_ns" }
+    }
+}
