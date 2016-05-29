@@ -67,7 +67,7 @@ public class Teletory {
 
 	private void hurtPlayer(Entity entity) {
 		entity.fallDistance = 0.0F;
-		entity.attackEntityFrom(DamageSource.fall, 5f);
+		entity.attackEntityFrom(DamageSource.fall, 3f);
 
 		if (entity.worldObj.rand.nextFloat() < 0.025F && entity.worldObj.getGameRules().getBoolean("doMobSpawning")) {
 			EntityEndermite entityendermite = new EntityEndermite(entity.worldObj);
