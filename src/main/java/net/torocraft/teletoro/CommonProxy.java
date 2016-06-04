@@ -23,9 +23,10 @@ public class CommonProxy {
 
 		Teletory teletory = new Teletory();
 		MinecraftForge.EVENT_BUS.register(teletory);
-		teletory.init(e);
+		Teletory.init(e);
 
 		GameRegistry.addRecipe(new ItemStack(BlockEnder.INSTANCE), "##", "##", '#', Items.ENDER_PEARL);
+
 
     }
 

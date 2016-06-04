@@ -16,16 +16,39 @@ public class TeletoryWorldProvider extends WorldProvider {
 		this.biomeProvider = new BiomeProviderSingle(Biomes.HELL);
 		this.isHellWorld = true;
 		this.hasNoSky = true;
+
+	}
+
+	@Override
+	public String getWelcomeMessage() {
+		return "Entering the Teletory";
+	}
+
+	@Override
+	public String getDepartMessage() {
+		return "Leaving the Teletory";
 	}
 
 	public DimensionType getDimensionType() {
 		return Teletory.type;
 	}
 
+	public static final int HEIGHT = 10;
+
+	@Override
+	public int getActualHeight() {
+		return HEIGHT;
+	}
+
+	@Override
+	public int getHeight() {
+		return HEIGHT;
+	}
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public Vec3d getFogColor(float par1, float par2) {
-		return new Vec3d(1.0D, 1.0D, 1.0D);
+		return new Vec3d(0D, 0D, 0D);
 	}
 
 	@Override
@@ -87,12 +110,12 @@ public class TeletoryWorldProvider extends WorldProvider {
 
 	@Override
 	public void updateWeather() {
-		super.updateWeather();
+
 	}
 
 	@Override
 	public void onWorldUpdateEntities() {
-		super.onWorldUpdateEntities();
+
 	}
 
 

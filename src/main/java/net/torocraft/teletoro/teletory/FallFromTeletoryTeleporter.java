@@ -10,7 +10,7 @@ import net.minecraft.world.WorldServer;
 
 public class FallFromTeletoryTeleporter extends Teleporter {
 
-	private static final int FALL_DISTANCE = 16;
+
 
 	private final WorldServer world;
 	private final Random random;
@@ -22,8 +22,50 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 	}
 
 	public void placeInPortal(Entity entityIn, float rotationYaw) {
-		System.out.println("=================== placeInPortal  DIM[" + entityIn.dimension + "] WORLD_DIM[" + world.provider.getDimension() + "]");
 		this.placeInExistingPortal(entityIn, rotationYaw);
+	}
+
+	public boolean placeInExistingPortal(Entity entity, float rotationYaw) {
+		PortalSearchState search = new PortalSearchState(entity, world);
+		BlockPos placement = findTopOfWorld(search);
+
+		double x = placement.getX() + 0.5D;
+		double y = placement.getY() + 0.5D;
+		double z = placement.getZ() + 0.5D;
+
+		double speed = 10;
+
+		double xVel = speed * Math.sin(rotationYaw);
+		double zVel = speed * Math.cos(rotationYaw);
+
+		entity.motionX = xVel;
+		entity.motionZ = zVel;
+		entity.motionY = 1;
+		entity.fallDistance = 0;
+		entity.velocityChanged = true;
+
+		entity.setLocationAndAngles(x, y, z, rotationYaw, -5);
+		return true;
+	}
+
+	private BlockPos findTopOfWorld(PortalSearchState search) {
+		int xSearch = MathHelper.floor_double(search.xEntity);
+		int zSearch = MathHelper.floor_double(search.zEntity);
+
+		int fallDistance = 6 + random.nextInt(10);
+
+		BlockPos searchPos = new BlockPos(xSearch, world.getActualHeight() - 1, zSearch);
+		while (searchPos.getY() >= 0) {
+			if (!world.isAirBlock(searchPos)) {
+				return searchPos.add(0, fallDistance, 0);
+			}
+			searchPos = searchPos.down();
+		}
+		return new BlockPos(xSearch, world.getActualHeight() - 1 + fallDistance, zSearch);
+	}
+
+	public boolean makePortal(Entity e) {
+		return true;
 	}
 
 	public static class PortalSearchState {
@@ -44,7 +86,6 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 		}
 
 		public PortalSearchState(Entity entity, WorldServer world) {
-
 			if (entity.dimension == Teletory.DIMID) {
 				xEntity = entity.posX / TeletoryTeleporter.TRAVEL_FACTOR;
 				yEntity = entity.posY;
@@ -54,61 +95,8 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 				xEntity = entity.posX * TeletoryTeleporter.TRAVEL_FACTOR;
 				yEntity = entity.posY;
 				zEntity = entity.posZ * TeletoryTeleporter.TRAVEL_FACTOR;
-
 			}
-
 		}
-
-	}
-
-	public boolean placeInExistingPortal(Entity entity, float rotationYaw) {
-
-		PortalSearchState search = new PortalSearchState(entity, world);
-
-		System.out.println("searching for insert location: " + search.toString());
-
-		BlockPos placement = findTopOfWorld(search);
-
-		System.out.println("found insert location of  " + placement.toString());
-
-		double x = placement.getX() + 0.5D;
-		double y = placement.getY() + 0.5D;
-		double z = placement.getZ() + 0.5D;
-
-		System.out.println("placing player at x[" + x + "] y[" + y + "] z[" + z + "]");
-
-		entity.motionX = entity.motionY = entity.motionZ = 0.0D;
-		entity.motionX = 8;
-		entity.motionY = 0.5;
-		entity.fallDistance = 0;
-
-		entity.setLocationAndAngles(x, y, z, 270, -5);
-		return true;
-	}
-
-	private BlockPos findTopOfWorld(PortalSearchState search) {
-
-		int xSearch = MathHelper.floor_double(search.xEntity);
-		int zSearch = MathHelper.floor_double(search.zEntity);
-
-		BlockPos searchPos = new BlockPos(xSearch, world.getActualHeight() - 1, zSearch);
-
-		System.out.println("starting search at " + searchPos);
-
-		while (searchPos.getY() >= 0) {
-			if (!world.isAirBlock(searchPos)) {
-				System.out.println("found ground level at y=" + searchPos.getY());
-				return searchPos.add(0, FALL_DISTANCE, 0);
-			}
-			searchPos = searchPos.down();
-		}
-
-		System.out.println("never found ground level placing at y=" + (world.getActualHeight() - 1));
-		return new BlockPos(xSearch, world.getActualHeight() - 1 + FALL_DISTANCE, zSearch);
-	}
-
-	public boolean makePortal(Entity e) {
-		return true;
 	}
 
 }

@@ -1,16 +1,13 @@
 package net.torocraft.teletoro.teletory;
 
-import static net.torocraft.teletoro.TeleToroUtil.getBlock;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.network.play.server.SPacketEffect;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
@@ -57,78 +54,37 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 				thePlayer.timeUntilPortal = 10;
 			} else if (thePlayer.dimension != Teletory.DIMID) {
 				thePlayer.timeUntilPortal = 10;
-				// thePlayer.changeDimension(Teletory.DIMID);
-				// thePlayer.mcServer.getPlayerList().transferPlayerToDimension(thePlayer,
-				// Teletory.DIMID, new
-				// TeletoryTeleporter(thePlayer.mcServer.worldServerForDimension(Teletory.DIMID)));
-
 				changeDimension(thePlayer, Teletory.DIMID);
-
+				thePlayer.addStat(TeleToroMod.TELETORY_ACHIEVEMNT);
 			} else {
 				changeDimension(thePlayer, 0);
-
-				// thePlayer.changeDimension(Teletory.DIMID);
-
 			}
 		}
 	}
 
-	private void changeDimension(EntityPlayerMP thePlayer, int dimId) {
-		// EntityPlayerMP
-
-		TeleToroUtil.setInvulnerableDimensionChange(thePlayer);
-
-		thePlayer.timeUntilPortal = 10;
-		thePlayer.mcServer.getPlayerList().transferPlayerToDimension(thePlayer, dimId, new TeletoryTeleporter(thePlayer.mcServer.worldServerForDimension(dimId)));
-
+	private void changeDimension(EntityPlayerMP player, int dimId) {
+		TeleToroUtil.setInvulnerableDimensionChange(player);
+		TeleToroUtil.resetStatusFields(player);
+		player.timeUntilPortal = 10;
+		player.mcServer.getPlayerList().transferPlayerToDimension(player, dimId, new TeletoryTeleporter(player.mcServer.worldServerForDimension(dimId)));
+		player.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
 	}
 
-	public boolean tryToCreatePortal(World par1World, int par2, int par3, int par4) {
-		byte b0 = 0;
-		byte b1 = 0;
-		if (getBlock(par1World, par2 - 1, par3, par4) == BlockEnder.INSTANCE || getBlock(par1World, par2 + 1, par3, par4) == BlockEnder.INSTANCE) {
-			b0 = 1;
-		}
-		if (getBlock(par1World, par2, par3, par4 - 1) == BlockEnder.INSTANCE || getBlock(par1World, par2, par3, par4 + 1) == BlockEnder.INSTANCE) {
-			b1 = 1;
-		}
+	public boolean trySpawnPortal(World worldIn, BlockPos pos) {
+		Size size = new Size(worldIn, pos, EnumFacing.Axis.X);
 
-		System.out.println(getBlock(par1World, par2 - 1, par3, par4));
-		System.out.println(getBlock(par1World, par2 + 1, par3, par4));
-		System.out.println(getBlock(par1World, par2, par3, par4 - 1));
-		System.out.println(getBlock(par1World, par2, par3, par4 + 1));
-
-		System.out.println("b0[" + b0 + "] b1[" + b1 + "]");
-
-		if (b0 == b1) {
-			return false;
-		} else {
-			if (getBlock(par1World, par2 - b0, par3, par4 - b1) == Blocks.AIR) {
-				par2 -= b0;
-				par4 -= b1;
-			}
-			int l;
-			int i1;
-			for (l = -1; l <= 2; ++l) {
-				for (i1 = -1; i1 <= 3; ++i1) {
-					boolean flag = l == -1 || l == 2 || i1 == -1 || i1 == 3;
-					if (l != -1 && l != 2 || i1 != -1 && i1 != 3) {
-						Block j1 = getBlock(par1World, par2 + b0 * l, par3 + i1, par4 + b1 * l);
-						if (flag) {
-							if (j1 != BlockEnder.INSTANCE) {
-								return false;
-							}
-						}
-					}
-				}
-			}
-			for (l = 0; l < 2; ++l) {
-				for (i1 = 0; i1 < 3; ++i1) {
-					IBlockState iblockstate = this.getDefaultState().withProperty(BlockPortal.AXIS, b0 == 0 ? EnumFacing.Axis.Z : EnumFacing.Axis.X);
-					par1World.setBlockState(new BlockPos(par2 + b0 * l, par3 + i1, par4 + b1 * l), iblockstate, 3);
-				}
-			}
+		if (size.isValid() && size.portalBlockCount == 0) {
+			size.placePortalBlocks();
 			return true;
+		} else {
+			Size size1 = new Size(worldIn, pos, EnumFacing.Axis.Z);
+
+			if (size1.isValid() && size1.portalBlockCount == 0) {
+				size1.placePortalBlocks();
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 

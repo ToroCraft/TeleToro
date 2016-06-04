@@ -12,24 +12,39 @@ public class TeleToroUtil {
 		return world.getBlockState(new BlockPos(i, j, k)).getBlock();
 	}
 
+	public static void resetStatusFields(EntityPlayerMP player) {
+		try {
+			Field lastExperience = getReflectionField("field_184856_bZ", "lastExperience");
+			Field lastHealth = getReflectionField("field_71149_ch", "lastHealth");
+			Field lastFoodLevel = getReflectionField("field_71146_ci", "lastFoodLevel");
+
+			lastExperience.setInt(player, -1);
+			lastHealth.setFloat(player, -1.0F);
+			lastFoodLevel.setInt(player, -1);
+		} catch (Exception e) {
+			throw new RuntimeException("Unable to set invulnerableDimensionChange via reflection", e);
+		}
+	}
+
 	public static void setInvulnerableDimensionChange(EntityPlayerMP thePlayer) {
 		try {
-
-			Field invulnerableDimensionChange = getFieldFromPlayer("field_184851_cj");
-
-			if (invulnerableDimensionChange == null) {
-				invulnerableDimensionChange = getFieldFromPlayer("invulnerableDimensionChange");
-			}
-
-			if (invulnerableDimensionChange == null) {
-				throw new RuntimeException("invulnerableDimensionChange field not found in " + EntityPlayerMP.class.getName());
-			}
-
-			invulnerableDimensionChange.setAccessible(true);
+			Field invulnerableDimensionChange = getReflectionField("field_184851_cj", "invulnerableDimensionChange");
 			invulnerableDimensionChange.setBoolean(thePlayer, true);
 		} catch (Exception e) {
 			throw new RuntimeException("Unable to set invulnerableDimensionChange via reflection", e);
 		}
+	}
+
+	public static Field getReflectionField(String... names) {
+		Field f = null;
+		for (String name : names) {
+			f = getFieldFromPlayer(name);
+			if (f != null) {
+				f.setAccessible(true);
+				return f;
+			}
+		}
+		throw new RuntimeException(join(names, ", ") + " field not found in " + EntityPlayerMP.class.getName());
 	}
 
 	public static Field getFieldFromPlayer(String name) {
@@ -38,6 +53,16 @@ public class TeleToroUtil {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	public static String join(String[] aArr, String sSep) {
+		StringBuilder sbStr = new StringBuilder();
+		for (int i = 0, il = aArr.length; i < il; i++) {
+			if (i > 0)
+				sbStr.append(sSep);
+			sbStr.append(aArr[i]);
+		}
+		return sbStr.toString();
 	}
 
 }

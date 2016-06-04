@@ -22,49 +22,12 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 
 	public Chunk provideChunk(int x, int z) {
 		ChunkPrimer chunkprimer = new ChunkPrimer();
-
-		/*
-		 * for (int i = 0; i < this.cachedBlockIDs.length; ++i) { IBlockState
-		 * iblockstate = this.cachedBlockIDs[i];
-		 * 
-		 * if (iblockstate != null) { for (int j = 0; j < 16; ++j) { for (int k
-		 * = 0; k < 16; ++k) { chunkprimer.setBlockState(j, i, k, iblockstate);
-		 * } } } }
-		 */
-
 		Chunk chunk = new Chunk(this.worldObj, chunkprimer, x, z);
-
-		/*
-		 * Biome[] abiome =
-		 * this.worldObj.getBiomeProvider().loadBlockGeneratorData((Biome[])
-		 * null, x * 16, z * 16, 16, 16); byte[] abyte = chunk.getBiomeArray();
-		 * 
-		 * for (int l = 0; l < abyte.length; ++l) { abyte[l] = (byte)
-		 * Biome.getIdForBiome(abiome[l]); }
-		 */
-
 		chunk.generateSkylightMap();
 		return chunk;
 	}
 
 	public void populate(int x, int z) {
-
-		/*
-		 * int i = x * 16; int j = z * 16; BlockPos blockpos = new BlockPos(i,
-		 * 0, j); Biome biome = this.worldObj.getBiomeGenForCoords(new
-		 * BlockPos(i + 16, 0, j + 16)); boolean flag = false;
-		 * this.random.setSeed(this.worldObj.getSeed()); long k =
-		 * this.random.nextLong() / 2L * 2L + 1L; long l =
-		 * this.random.nextLong() / 2L * 2L + 1L; this.random.setSeed((long) x *
-		 * k + (long) z * l ^ this.worldObj.getSeed()); ChunkPos chunkpos = new
-		 * ChunkPos(x, z);
-		 * 
-		 * for (MapGenStructure mapgenstructure : this.structureGenerators) {
-		 * boolean flag1 = mapgenstructure.generateStructure(this.worldObj,
-		 * this.random, chunkpos);
-		 * 
-		 * if (mapgenstructure instanceof MapGenVillage) { flag |= flag1; } }
-		 */
 
 	}
 

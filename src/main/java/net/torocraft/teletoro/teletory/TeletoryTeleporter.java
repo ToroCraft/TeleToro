@@ -4,7 +4,6 @@ import java.util.Random;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
@@ -21,29 +20,12 @@ import net.torocraft.teletoro.blocks.BlockEnder;
 
 public class TeletoryTeleporter extends Teleporter {
 
-	public static final double TRAVEL_FACTOR = 32;
-
-	/*
-	 * fix portal cache support one block off problems remove portal particles
-	 * particles portal texture ender block light with flint and steel?
-	 *
-	 */
+	public static final int TRAVEL_FACTOR = 64;
+	private static final int PORTAL_SEARCH_RADIUS = 128;
 
 	private final WorldServer world;
-	/** A private Random() function in Teleporter */
 	private final Random random;
-	/** Stores successful portal placement locations for rapid lookup. */
-	// private final LongHashMap destinationCoordinateCache = new LongHashMap();
-
 	private final Long2ObjectMap<Teleporter.PortalPosition> destinationCoordinateCache = new Long2ObjectOpenHashMap(4096);
-
-	/**
-	 * A list of valid keys for the destinationCoordainteCache. These are based
-	 * on the X & Z of the players initial location.
-	 */
-	// private final List destinationCoordinateKeys =
-	// com.google.common.collect.Lists.newArrayList();
-	// private static final String __OBFID = "CL_00000153";
 
 	public TeletoryTeleporter(WorldServer worldIn) {
 		super(worldIn);
@@ -52,132 +34,70 @@ public class TeletoryTeleporter extends Teleporter {
 	}
 
 	public void placeInPortal(Entity entityIn, float rotationYaw) {
-		System.out.println("=================== placeInPortal  DIM[" + entityIn.dimension + "]");
-
-		if (!this.placeInExistingPortal(entityIn, rotationYaw)) {
-			if (!this.makePortal(entityIn)) {
-				System.out.println("lame, tried to make a portal but failed");
-			}
-			System.out.println("attempting to place player again after creating a portal");
-			this.placeInExistingPortal(entityIn, rotationYaw);
+		if (!placeInExistingPortal(entityIn, rotationYaw)) {
+			makePortal(entityIn);
+			placeInExistingPortal(entityIn, rotationYaw);
 		}
-	}
-
-	public static class PortalSearchState {
-
-		public double distance;
-		public BlockPos portalPos;
-		public boolean notCached;
-
-		public double xEntity;
-		public double yEntity;
-		public double zEntity;
-
-		public int xSearch;
-		public int zSearch;
-
-		public long longXZPair;
-
-		public PortalSearchState(Entity entity, WorldServer world) {
-			distance = -1.0D;
-			portalPos = BlockPos.ORIGIN;
-			notCached = true;
-
-			if (world.provider.getDimension() == Teletory.DIMID) {
-
-				longXZPair = ChunkPos.chunkXZ2Int(MathHelper.floor_double(entity.posX), MathHelper.floor_double(entity.posZ));
-
-				xEntity = entity.posX / TRAVEL_FACTOR;
-				yEntity = entity.posY;
-				zEntity = entity.posZ / TRAVEL_FACTOR;
-
-				xSearch = MathHelper.floor_double(xEntity);
-				zSearch = MathHelper.floor_double(zEntity);
-
-			} else {
-
-				xEntity = entity.posX * TRAVEL_FACTOR;
-				yEntity = entity.posY;
-				zEntity = entity.posZ * TRAVEL_FACTOR;
-
-				xSearch = MathHelper.floor_double(xEntity);
-				zSearch = MathHelper.floor_double(zEntity);
-
-				longXZPair = ChunkPos.chunkXZ2Int(xSearch, zSearch);
-			}
-
-			System.out.println("search location x[" + xSearch + "] z[" + zSearch + "]");
-		}
-
 	}
 
 	public boolean placeInExistingPortal(Entity entity, float rotationYaw) {
+		PortalSearchState state = new PortalSearchState(entity, world);
 
-		PortalSearchState search = new PortalSearchState(entity, world);
-
-		System.out.println("search cache for portal with key [" + search.longXZPair + "]");
-
-		if (portalIsCached(search.longXZPair)) {
-			readCachedPortal(search, search.longXZPair);
+		if (portalIsCached(state.longXZPair)) {
+			readCachedPortal(state);
 		} else {
-			searchForNearbyPortals(search);
+			searchForNearbyPortals(state);
 		}
 
-		if (noPortalFound(search.distance)) {
-			System.out.println("No portal found");
+		if (noPortalFound(state.distance)) {
 			return false;
 		}
 
-		handleFoundPortal(entity, rotationYaw, search);
+		handleFoundPortal(entity, rotationYaw, state);
 		return true;
 	}
 
-	private void readCachedPortal(PortalSearchState search, long longXZPair) {
-		Teleporter.PortalPosition portalposition = destinationCoordinateCache.get(longXZPair);
+	private void readCachedPortal(PortalSearchState search) {
+		Teleporter.PortalPosition portalposition = destinationCoordinateCache.get(search.longXZPair);
 		search.distance = 0.0D;
 		search.portalPos = portalposition;
 		portalposition.lastUpdateTime = world.getTotalWorldTime();
-
-		System.out.println("****** found cached portal [" + search.portalPos + "]");
-
 		search.notCached = false;
 	}
 
-	private static final int PORTAL_SEARCH_RADIUS = 128; // was 128
-
 	private void searchForNearbyPortals(PortalSearchState search) {
 		BlockPos entityPos = new BlockPos(search.xSearch, world.getActualHeight() - 1, search.zSearch);
+		BlockPos nextSearch;
+		int searchRadius = PORTAL_SEARCH_RADIUS;
 
-		System.out.println("world height = " + world.getActualHeight());
+		if (world.provider.getDimension() == Teletory.DIMID) {
+			searchRadius = 2;
+		}
 
-		System.out.println("commencing search x[" + search.xSearch + "] z[" + search.zSearch + "]");
-
-		for (int x = -PORTAL_SEARCH_RADIUS; x <= PORTAL_SEARCH_RADIUS; ++x) {
-			BlockPos blockpos1;
-
-			for (int z = -PORTAL_SEARCH_RADIUS; z <= PORTAL_SEARCH_RADIUS; ++z) {
-
-				for (BlockPos searchPos = entityPos.add(x, 0, z); searchPos.getY() >= 0; searchPos = blockpos1) {
-					blockpos1 = searchPos.down();
-
-					if (isPortal(searchPos)) {
-
-						while (world.getBlockState(blockpos1 = searchPos.down()).getBlock() == BlockTeletoryPortal.INSTANCE) {
-							searchPos = blockpos1;
-						}
-
-						double distanceToFoundPortal = searchPos.distanceSq(entityPos);
-
-						if (noPortalFound(search.distance) || distanceToFoundPortal < search.distance) {
-							search.distance = distanceToFoundPortal;
-							search.portalPos = searchPos;
-						}
-
-						System.out.println("found portal [" + searchPos + "]");
-
-					}
+		for (int x = -searchRadius; x <= searchRadius; ++x) {
+			for (int z = -searchRadius; z <= searchRadius; ++z) {
+				for (BlockPos searchPos = entityPos.add(x, 0, z - 2); searchPos.getY() >= 0; searchPos = nextSearch) {
+					nextSearch = searchPos.down();
+					searchForPortalAtBlock(search, entityPos, nextSearch, searchPos);
 				}
 			}
+		}
+	}
+
+	protected void searchForPortalAtBlock(PortalSearchState search, BlockPos entityPos, BlockPos nextSearch, BlockPos searchPos) {
+		if (!isPortal(searchPos)) {
+			return;
+		}
+
+		while (world.getBlockState(nextSearch = searchPos.down()).getBlock() == BlockTeletoryPortal.INSTANCE) {
+			searchPos = nextSearch;
+		}
+
+		double distanceToFoundPortal = searchPos.distanceSq(entityPos);
+
+		if (noPortalFound(search.distance) || distanceToFoundPortal < search.distance) {
+			search.distance = distanceToFoundPortal;
+			search.portalPos = searchPos;
 		}
 	}
 
@@ -187,57 +107,35 @@ public class TeletoryTeleporter extends Teleporter {
 
 	private void handleFoundPortal(Entity entity, float rotationYaw, PortalSearchState search) {
 		cachePortalLocation(search);
-
 		double x = (double) (search.portalPos).getX() + 0.5D;
 		double y = (double) (search.portalPos).getY() + 0.5D;
 		double z = (double) (search.portalPos).getZ() + 0.5D;
-
-		System.out.println("placing player at x[" + x + "] y[" + y + "] z[" + z + "]");
-
 		entity.motionX = entity.motionY = entity.motionZ = 0.0D;
-
-		// entity.setLocationAndAngles(x, y, z, entity.rotationYaw,
-		// entity.rotationPitch);
-
-		/*
-		 * if (!world.isRemote && entity instanceof EntityPlayerMP) {
-		 * entity.fallDistance = 0.0F; entity.setPositionAndUpdate(x, y, z); }
-		 */
-		// if (!world.isRemote) {
+		if (!world.isRemote) {
 			if (entity instanceof EntityPlayerMP) {
 				((EntityPlayerMP) entity).connection.setPlayerLocation(x, y, z, entity.rotationYaw, entity.rotationPitch);
 			} else {
 				entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
 			}
-		// }
-		/*
-		 * if (entity instanceof EntityPlayerMP) {
-		 * System.out.println("EntityPlayerMP"); ((EntityPlayerMP)
-		 * entity).playerNetServerHandler.setPlayerLocation(x, y, z,
-		 * entity.rotationYaw, entity.rotationPitch); } else {
-		 * System.out.println("Not EntityPlayerMP");
-		 * entity.setLocationAndAngles(x, y, z, entity.rotationYaw,
-		 * entity.rotationPitch); }
-		 */
-
+		}
 	}
 
 	private EnumFacing determinePortalDirection(PortalSearchState search) {
 		EnumFacing portalDirection = null;
 
-		if (this.world.getBlockState((search.portalPos).west()).getBlock() == BlockTeletoryPortal.INSTANCE) {
+		if (world.getBlockState((search.portalPos).west()).getBlock() == BlockTeletoryPortal.INSTANCE) {
 			portalDirection = EnumFacing.NORTH;
 		}
 
-		if (this.world.getBlockState((search.portalPos).east()).getBlock() == BlockTeletoryPortal.INSTANCE) {
+		if (world.getBlockState((search.portalPos).east()).getBlock() == BlockTeletoryPortal.INSTANCE) {
 			portalDirection = EnumFacing.SOUTH;
 		}
 
-		if (this.world.getBlockState((search.portalPos).north()).getBlock() == BlockTeletoryPortal.INSTANCE) {
+		if (world.getBlockState((search.portalPos).north()).getBlock() == BlockTeletoryPortal.INSTANCE) {
 			portalDirection = EnumFacing.EAST;
 		}
 
-		if (this.world.getBlockState((search.portalPos).south()).getBlock() == BlockTeletoryPortal.INSTANCE) {
+		if (world.getBlockState((search.portalPos).south()).getBlock() == BlockTeletoryPortal.INSTANCE) {
 			portalDirection = EnumFacing.WEST;
 		}
 		return portalDirection;
@@ -245,8 +143,7 @@ public class TeletoryTeleporter extends Teleporter {
 
 	private void cachePortalLocation(PortalSearchState search) {
 		if (search.notCached) {
-			this.destinationCoordinateCache.put(search.longXZPair, new Teleporter.PortalPosition(search.portalPos, this.world.getTotalWorldTime()));
-
+			destinationCoordinateCache.put(search.longXZPair, new Teleporter.PortalPosition(search.portalPos, world.getTotalWorldTime()));
 		}
 	}
 
@@ -271,22 +168,16 @@ public class TeletoryTeleporter extends Teleporter {
 	}
 
 	public boolean makePortalOnPlatform(Entity e) {
-
 		PortalSearchState search = new PortalSearchState(e, world);
-
 		int x = search.xSearch;
-		int y = 10;
+		int y = 3;
 		int z = search.zSearch;
-
 		buildPortalFloor(x, y, z);
-
 		placePortalBlocks(z, x, y, 1, 0);
-
 		return true;
 	}
 
 	public boolean makePortalOnExistingGround(Entity e) {
-
 		PortalSearchState search = new PortalSearchState(e, world);
 
 		byte b0 = 16;
@@ -295,8 +186,6 @@ public class TeletoryTeleporter extends Teleporter {
 		int i = search.xSearch;
 		int j = MathHelper.floor_double(e.posY);
 		int k = search.zSearch;
-
-		System.out.println("=================== makePortal   DIM[" + world.provider.getDimension() + "]  make portal x[" + i + "] z[" + k + "]   xd[" + search.xEntity + "] zd[" + search.zEntity + "] ");
 
 		int l = i;
 		int i1 = j;
@@ -452,12 +341,16 @@ public class TeletoryTeleporter extends Teleporter {
 	}
 
 	private void buildPortalFloor(int x, int y, int z) {
-		int size = 10;
+		int size = 8;
 		int y1 = y - 1;
+		BlockPos pos;
 
-		for (int x1 = -size / 2; x1 < size / 2; x1++) {
+		for (int x1 = -(size / 2); x1 < size / 2; x1++) {
 			for (int z1 = -size / 2; z1 < size / 2; z1++) {
-				world.setBlockState(new BlockPos(x1 + x, y1, z1 + z), Blocks.END_STONE.getDefaultState());
+				pos = new BlockPos(x1 + x + 1, y1, z1 + z);
+				if (!world.isSideSolid(pos, EnumFacing.UP)) {
+					world.setBlockState(pos, Blocks.END_STONE.getDefaultState());
+				}
 			}
 		}
 	}
@@ -469,8 +362,6 @@ public class TeletoryTeleporter extends Teleporter {
 		int x;
 		int y;
 		int z;
-
-		System.out.println("x[" + xIn + "] y[" + yIn + "] z[" + zIn + "]  l5[" + l5 + "] l2[" + l2 + "]");
 
 		IBlockState iblockstate = BlockTeletoryPortal.INSTANCE.getDefaultState().withProperty(BlockPortal.AXIS, l5 == 0 ? EnumFacing.Axis.Z : EnumFacing.Axis.X);
 
@@ -496,38 +387,51 @@ public class TeletoryTeleporter extends Teleporter {
 		}
 	}
 
-	/**
-	 * called periodically to remove out-of-date portal locations from the cache
-	 * list. Argument par1 is a WorldServer.getTotalWorldTime() value.
-	 */
-	/**
-	 * called periodically to remove out-of-date portal locations from the cache
-	 * list. Argument par1 is a WorldServer.getTotalWorldTime() value.
-	 */
-	public void removeStalePortalLocations(long worldTime) {
-		if (worldTime % 100L == 0L) {
-			long i = worldTime - 300L;
-			ObjectIterator<Teleporter.PortalPosition> objectiterator = this.destinationCoordinateCache.values().iterator();
+	public static class PortalSearchState {
 
-			while (objectiterator.hasNext()) {
-				Teleporter.PortalPosition teleporter$portalposition = (Teleporter.PortalPosition) objectiterator.next();
+		public double distance;
+		public BlockPos portalPos;
+		public boolean notCached;
 
-				if (teleporter$portalposition == null || teleporter$portalposition.lastUpdateTime < i) {
-					objectiterator.remove();
-				}
+		public double xEntity;
+		public double yEntity;
+		public double zEntity;
+
+		public int xSearch;
+		public int zSearch;
+
+		public long longXZPair;
+
+		public PortalSearchState(Entity entity, WorldServer world) {
+			distance = -1.0D;
+			portalPos = BlockPos.ORIGIN;
+			notCached = true;
+
+			if (world.provider.getDimension() == Teletory.DIMID) {
+
+				longXZPair = ChunkPos.chunkXZ2Int(MathHelper.floor_double(entity.posX), MathHelper.floor_double(entity.posZ));
+
+				xEntity = entity.posX / TRAVEL_FACTOR;
+				yEntity = entity.posY;
+				zEntity = entity.posZ / TRAVEL_FACTOR;
+
+				xSearch = MathHelper.floor_double(xEntity);
+				zSearch = MathHelper.floor_double(zEntity);
+
+			} else {
+
+				xEntity = entity.posX * TRAVEL_FACTOR;
+				yEntity = entity.posY;
+				zEntity = entity.posZ * TRAVEL_FACTOR;
+
+				xSearch = MathHelper.floor_double(xEntity);
+				zSearch = MathHelper.floor_double(zEntity);
+
+				longXZPair = ChunkPos.chunkXZ2Int(xSearch, zSearch);
 			}
-		}
-	}
 
-	public class PortalPosition extends BlockPos {
-		/** The worldtime at which this PortalPosition was last verified */
-		public long lastUpdateTime;
-		private static final String __OBFID = "CL_00000154";
-
-		public PortalPosition(BlockPos pos, long p_i45747_3_) {
-			super(pos.getX(), pos.getY(), pos.getZ());
-			this.lastUpdateTime = p_i45747_3_;
 		}
+
 	}
 
 }

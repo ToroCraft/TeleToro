@@ -9,14 +9,17 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.network.play.server.SPacketEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
+import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -25,27 +28,10 @@ import net.torocraft.teletoro.TeleToroUtil;
 public class Teletory {
 
 	public static int DIMID = 16;
-	public static DimensionType type = DimensionType.register("teletory", "_teletory", DIMID, TeletoryWorldProvider.class, false);
+	public static DimensionType type = DimensionType.register("teletory", "_teletory", DIMID, TeletoryWorldProvider.class, true);
 
-	// public static BlockTeletoryPortal portal;
-	// public static Item trigger;
-
-	static {
-
-
-		// trigger = new
-		// ItemTeletoryTrigger().setUnlocalizedName("teletory_trigger");
-
-		// trigger = Items.FLINT_AND_STEEL;
-
-		// Item.itemRegistry.addObject(432, "teletory_trigger", block);
-	}
-
-	public void init(FMLInitializationEvent event) {
-
+	public static void init(FMLInitializationEvent event) {
 		DimensionManager.registerDimension(DIMID, type);
-
-
 	}
 
 	private boolean isRunTick(World world) {
@@ -53,9 +39,33 @@ public class Teletory {
 	}
 
 	@SubscribeEvent
+	public void limitBuildHeight(PlaceEvent event) {
+		if (event.getBlockSnapshot() != null && event.getBlockSnapshot().getDimId() != Teletory.DIMID) {
+			return;
+		}
+
+		if (event.getPlayer() == null) {
+			return;
+		}
+
+		if (event.getBlockSnapshot().getPos().getY() > 10) {
+			event.getPlayer().addChatMessage(new TextComponentString("max build height"));
+			event.setCanceled(true);
+		}
+	}
+
+	@SubscribeEvent
 	public void feelThePainOfTheTeletory(TickEvent.PlayerTickEvent event) {
 		if (event.player.dimension != Teletory.DIMID) {
 			return;
+		}
+
+		if (!(event.player instanceof EntityPlayerMP)) {
+			return;
+		}
+
+		if (event.player.posY < -5) {
+			changeDimension((EntityPlayerMP) event.player, 0);
 		}
 
 		if (isRunTick(event.player.worldObj)) {
@@ -69,7 +79,7 @@ public class Teletory {
 		entity.fallDistance = 0.0F;
 		entity.attackEntityFrom(DamageSource.fall, 3f);
 
-		if (entity.worldObj.rand.nextFloat() < 0.025F && entity.worldObj.getGameRules().getBoolean("doMobSpawning")) {
+		if (entity.worldObj.rand.nextFloat() < 0.015F && entity.worldObj.getGameRules().getBoolean("doMobSpawning")) {
 			EntityEndermite entityendermite = new EntityEndermite(entity.worldObj);
 			entityendermite.setSpawnedByPlayer(true);
 			entityendermite.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
@@ -128,13 +138,11 @@ public class Teletory {
 
 		Block i1 = getBlock(event.getWorld(), par4, par5, par6);
 		if (i1 == Blocks.AIR) {
-			System.out.println("tryToCreatePortal");
-			boolean created = BlockTeletoryPortal.INSTANCE.tryToCreatePortal(event.getWorld(), par4, par5, par6);
+			boolean created = BlockTeletoryPortal.INSTANCE.trySpawnPortal(event.getWorld(), new BlockPos(par4, par5, par6));
 			if (created) {
 				event.setCanceled(true);
 			}
 		}
-
 	}
 
 	@SubscribeEvent
@@ -155,10 +163,16 @@ public class Teletory {
 
 		ev.setCanceled(true);
 
-		TeleToroUtil.setInvulnerableDimensionChange(thePlayer);
-
-		thePlayer.mcServer.getPlayerList().transferPlayerToDimension(thePlayer, 0, new FallFromTeletoryTeleporter(thePlayer.mcServer.worldServerForDimension(0)));
+		changeDimension(thePlayer, 0);
 
 	}
 
+
+	private void changeDimension(EntityPlayerMP player, int dimId) {
+		TeleToroUtil.setInvulnerableDimensionChange(player);
+		TeleToroUtil.resetStatusFields(player);
+		player.timeUntilPortal = 10;
+		player.mcServer.getPlayerList().transferPlayerToDimension(player, dimId, new FallFromTeletoryTeleporter(player.mcServer.worldServerForDimension(dimId)));
+		player.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
+	}
 }
