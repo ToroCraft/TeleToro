@@ -6,15 +6,30 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.Teleporter;
+import net.minecraft.world.WorldServer;
+import net.torocraft.teletoro.teletory.TeletoryTeleporter;
 
 public class TeleToroUtil {
 	public static Block getBlock(IBlockAccess world, int i, int j, int k) {
 		return world.getBlockState(new BlockPos(i, j, k)).getBlock();
 	}
 
+	public static TeletoryTeleporter getTeleporter(WorldServer world) {
+		for (Teleporter t : world.customTeleporters) {
+			if (t instanceof TeletoryTeleporter) {
+				return (TeletoryTeleporter) t;
+			}
+		}
+
+		TeletoryTeleporter t = new TeletoryTeleporter(world);
+		world.customTeleporters.add(t);
+		return t;
+	}
+
 	public static void resetStatusFields(EntityPlayerMP player) {
 		try {
-			Field lastExperience = getReflectionField("field_184856_bZ", "lastExperience");
+			Field lastExperience = getReflectionField("field_71144_ck", "lastExperience");
 			Field lastHealth = getReflectionField("field_71149_ch", "lastHealth");
 			Field lastFoodLevel = getReflectionField("field_71146_ci", "lastFoodLevel");
 
@@ -22,7 +37,7 @@ public class TeleToroUtil {
 			lastHealth.setFloat(player, -1.0F);
 			lastFoodLevel.setInt(player, -1);
 		} catch (Exception e) {
-			throw new RuntimeException("Unable to set invulnerableDimensionChange via reflection", e);
+			throw new RuntimeException("Unable to set reset status fields via reflection", e);
 		}
 	}
 

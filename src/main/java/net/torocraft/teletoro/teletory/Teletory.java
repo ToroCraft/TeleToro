@@ -16,6 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
@@ -169,10 +170,16 @@ public class Teletory {
 
 
 	private void changeDimension(EntityPlayerMP player, int dimId) {
+
+		// FIXME
+		if (player.worldObj.isRemote || !(player.worldObj instanceof WorldServer)) {
+			return;
+		}
+
 		TeleToroUtil.setInvulnerableDimensionChange(player);
-		TeleToroUtil.resetStatusFields(player);
 		player.timeUntilPortal = 10;
 		player.mcServer.getPlayerList().transferPlayerToDimension(player, dimId, new FallFromTeletoryTeleporter(player.mcServer.worldServerForDimension(dimId)));
 		player.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
+		TeleToroUtil.resetStatusFields(player);
 	}
 }

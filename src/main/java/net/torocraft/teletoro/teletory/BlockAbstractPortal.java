@@ -16,12 +16,11 @@ import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.monster.EntityPigZombie;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SPacketEffect;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
@@ -31,8 +30,10 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.torocraft.teletoro.TeleToroUtil;
 
 public abstract class BlockAbstractPortal extends BlockBreakable {
 	public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis>create("axis", EnumFacing.Axis.class, new EnumFacing.Axis[] { EnumFacing.Axis.X, EnumFacing.Axis.Z });
@@ -60,23 +61,6 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
 		super.updateTick(worldIn, pos, state, rand);
-
-		if (worldIn.provider.isSurfaceWorld() && worldIn.getGameRules().getBoolean("doMobSpawning") && rand.nextInt(2000) < worldIn.getDifficulty().getDifficultyId()) {
-			int i = pos.getY();
-			BlockPos blockpos;
-
-			for (blockpos = pos; !worldIn.getBlockState(blockpos).isFullyOpaque() && blockpos.getY() > 0; blockpos = blockpos.down()) {
-				;
-			}
-
-			if (i > 0 && !worldIn.getBlockState(blockpos.up()).isNormalCube()) {
-				Entity entity = ItemMonsterPlacer.spawnCreature(worldIn, EntityList.getEntityStringFromClass(EntityPigZombie.class), (double) blockpos.getX() + 0.5D, (double) blockpos.getY() + 1.1D, (double) blockpos.getZ() + 0.5D);
-
-				if (entity != null) {
-					entity.timeUntilPortal = entity.getPortalCooldown();
-				}
-			}
-		}
 	}
 
 	@Nullable
@@ -92,17 +76,18 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 		return false;
 	}
 
-	public boolean trySpawnPortal(World worldIn, BlockPos pos) {
-		Size blockportal$size = getSizer(worldIn, pos, EnumFacing.Axis.X);
 
-		if (blockportal$size.isValid() && blockportal$size.portalBlockCount == 0) {
-			blockportal$size.placePortalBlocks();
+	public boolean trySpawnPortal(World worldIn, BlockPos pos) {
+		Size size = getSizer(worldIn, pos, EnumFacing.Axis.X);
+
+		if (size.isValid() && size.portalBlockCount == 0) {
+			size.placePortalBlocks();
 			return true;
 		} else {
-			Size blockportal$size1 = getSizer(worldIn, pos, EnumFacing.Axis.Z);
+			Size size1 = getSizer(worldIn, pos, EnumFacing.Axis.Z);
 
-			if (blockportal$size1.isValid() && blockportal$size1.portalBlockCount == 0) {
-				blockportal$size1.placePortalBlocks();
+			if (size1.isValid() && size1.portalBlockCount == 0) {
+				size1.placePortalBlocks();
 				return true;
 			} else {
 				return false;
@@ -167,10 +152,43 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 	/**
 	 * Called When an Entity Collided with the Block
 	 */
-	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
-		if (!entityIn.isRiding() && !entityIn.isBeingRidden() && entityIn.isNonBoss()) {
-			entityIn.setPortal(pos);
+	// TODO add timeUntilPortal logic
+	public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
+
+		if (world.isRemote || entity.getRidingEntity() != null || entity.isBeingRidden()) {
+			return;
 		}
+		
+		int par2 = pos.getX();
+		int par3 = pos.getY();
+		int par4 = pos.getZ();
+		
+		int nextDimension = getNextDimension(world, pos, state, entity);
+
+		if (entity instanceof EntityPlayerMP) {
+			EntityPlayerMP player = (EntityPlayerMP) entity;
+			player.timeUntilPortal = 10;
+			changePlayerDimension(player, nextDimension);
+			onDimesionChange(nextDimension, player);
+		} else {
+			// TODO support non-player entities
+		}
+	}
+
+	protected abstract void onDimesionChange(int dimId, EntityPlayerMP player);
+
+	public abstract int getNextDimension(World world, BlockPos pos, IBlockState state, Entity entity);
+
+	private void changePlayerDimension(EntityPlayerMP player, int dimId) {
+		if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(player, dimId)) {
+			return;
+		}
+		WorldServer world = player.mcServer.worldServerForDimension(dimId);
+		TeleToroUtil.setInvulnerableDimensionChange(player);
+		player.timeUntilPortal = 10;
+		player.mcServer.getPlayerList().transferPlayerToDimension(player, dimId, TeleToroUtil.getTeleporter(world));
+		player.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
+		TeleToroUtil.resetStatusFields(player);
 	}
 
 	@Nullable
@@ -440,4 +458,6 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 			}
 		}
 	}
+
+
 }
