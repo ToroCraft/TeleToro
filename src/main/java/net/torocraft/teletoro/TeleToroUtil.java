@@ -4,10 +4,12 @@ import java.lang.reflect.Field;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.play.server.SPacketEffect;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
+import net.torocraft.teletoro.teleporter.FallFromTeletoryTeleporter;
 import net.torocraft.teletoro.teleporter.TeletoryTeleporter;
 
 public class TeleToroUtil {
@@ -15,14 +17,39 @@ public class TeleToroUtil {
 		return world.getBlockState(new BlockPos(i, j, k)).getBlock();
 	}
 
-	public static TeletoryTeleporter getTeleporter(WorldServer world) {
+	public static enum TeleportorType {
+		PORTAL, FALL
+	};
+
+	public static Teleporter getTeleporter(WorldServer world, TeleportorType type) {
+		switch (type) {
+		case FALL:
+			return getFallTeleporter(world);
+		case PORTAL:
+			return getPortalTeleporter(world);
+		default:
+			throw new UnsupportedOperationException("unknown teleporter [" + type + "]");
+		}
+	}
+
+	public static TeletoryTeleporter getPortalTeleporter(WorldServer world) {
 		for (Teleporter t : world.customTeleporters) {
 			if (t instanceof TeletoryTeleporter) {
 				return (TeletoryTeleporter) t;
 			}
 		}
-
 		TeletoryTeleporter t = new TeletoryTeleporter(world);
+		world.customTeleporters.add(t);
+		return t;
+	}
+
+	public static FallFromTeletoryTeleporter getFallTeleporter(WorldServer world) {
+		for (Teleporter t : world.customTeleporters) {
+			if (t instanceof FallFromTeletoryTeleporter) {
+				return (FallFromTeletoryTeleporter) t;
+			}
+		}
+		FallFromTeletoryTeleporter t = new FallFromTeletoryTeleporter(world);
 		world.customTeleporters.add(t);
 		return t;
 	}
@@ -80,4 +107,16 @@ public class TeleToroUtil {
 		return sbStr.toString();
 	}
 
+	public static boolean changePlayerDimension(EntityPlayerMP player, int dimId, TeleportorType type) {
+		if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(player, dimId)) {
+			return false;
+		}
+		WorldServer world = player.mcServer.worldServerForDimension(dimId);
+		TeleToroUtil.setInvulnerableDimensionChange(player);
+		player.timeUntilPortal = 10;
+		player.mcServer.getPlayerList().transferPlayerToDimension(player, dimId, getTeleporter(world, type));
+		player.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
+		TeleToroUtil.resetStatusFields(player);
+		return true;
+	}
 }

@@ -20,7 +20,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.SPacketEffect;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
@@ -30,10 +29,10 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.torocraft.teletoro.TeleToroUtil;
+import net.torocraft.teletoro.TeleToroUtil.TeleportorType;
 
 public abstract class BlockAbstractPortal extends BlockBreakable {
 	public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis>create("axis", EnumFacing.Axis.class, new EnumFacing.Axis[] { EnumFacing.Axis.X, EnumFacing.Axis.Z });
@@ -75,7 +74,6 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 	public boolean isFullCube(IBlockState state) {
 		return false;
 	}
-
 
 	public boolean trySpawnPortal(World worldIn, BlockPos pos) {
 		Size size = getSizer(worldIn, pos, EnumFacing.Axis.X);
@@ -152,23 +150,24 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 	/**
 	 * Called When an Entity Collided with the Block
 	 */
-	// TODO add timeUntilPortal logic
 	public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
 
 		if (world.isRemote || entity.getRidingEntity() != null || entity.isBeingRidden()) {
 			return;
 		}
-		
+
 		int par2 = pos.getX();
 		int par3 = pos.getY();
 		int par4 = pos.getZ();
-		
+
 		int nextDimension = getNextDimension(world, pos, state, entity);
 
-		if (entity instanceof EntityPlayerMP) {
+		if (entity.timeUntilPortal > 0) {
+			entity.timeUntilPortal = 10;
+		} else if (entity instanceof EntityPlayerMP) {
 			EntityPlayerMP player = (EntityPlayerMP) entity;
 			player.timeUntilPortal = 10;
-			changePlayerDimension(player, nextDimension);
+			TeleToroUtil.changePlayerDimension(player, nextDimension, TeleportorType.PORTAL);
 			onDimesionChange(nextDimension, player);
 		} else {
 			// TODO support non-player entities
@@ -178,18 +177,6 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 	protected abstract void onDimesionChange(int dimId, EntityPlayerMP player);
 
 	public abstract int getNextDimension(World world, BlockPos pos, IBlockState state, Entity entity);
-
-	private void changePlayerDimension(EntityPlayerMP player, int dimId) {
-		if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(player, dimId)) {
-			return;
-		}
-		WorldServer world = player.mcServer.worldServerForDimension(dimId);
-		TeleToroUtil.setInvulnerableDimensionChange(player);
-		player.timeUntilPortal = 10;
-		player.mcServer.getPlayerList().transferPlayerToDimension(player, dimId, TeleToroUtil.getTeleporter(world));
-		player.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
-		TeleToroUtil.resetStatusFields(player);
-	}
 
 	@Nullable
 	public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
@@ -458,6 +445,5 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 			}
 		}
 	}
-
 
 }
