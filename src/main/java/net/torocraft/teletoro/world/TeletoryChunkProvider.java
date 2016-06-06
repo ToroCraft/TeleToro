@@ -1,4 +1,4 @@
-package net.torocraft.teletoro.teletory;
+package net.torocraft.teletoro.world;
 
 import java.util.Collections;
 import java.util.List;

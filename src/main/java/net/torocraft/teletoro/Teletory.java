@@ -1,4 +1,4 @@
-package net.torocraft.teletoro.teletory;
+package net.torocraft.teletoro;
 
 import static net.torocraft.teletoro.TeleToroUtil.getBlock;
 
@@ -24,7 +24,9 @@ import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.torocraft.teletoro.TeleToroUtil;
+import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
+import net.torocraft.teletoro.teleporter.FallFromTeletoryTeleporter;
+import net.torocraft.teletoro.world.TeletoryWorldProvider;
 
 public class Teletory {
 

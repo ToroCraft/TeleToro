@@ -8,8 +8,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.blocks.BlockEnder;
-import net.torocraft.teletoro.teletory.BlockTeletoryPortal;
-import net.torocraft.teletoro.teletory.Teletory;
+import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 
 public class CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {

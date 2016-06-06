@@ -1,4 +1,4 @@
-package net.torocraft.teletoro.teletory;
+package net.torocraft.teletoro.world;
 
 import net.minecraft.init.Biomes;
 import net.minecraft.util.math.Vec3d;
@@ -9,6 +9,7 @@ import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraftforge.client.IRenderHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.torocraft.teletoro.Teletory;
 
 public class TeletoryWorldProvider extends WorldProvider {
 

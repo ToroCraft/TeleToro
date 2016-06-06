@@ -4,7 +4,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.torocraft.teletoro.blocks.BlockEnder;
-import net.torocraft.teletoro.teletory.BlockTeletoryPortal;
+import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 
 public class ClientProxy extends CommonProxy {
 

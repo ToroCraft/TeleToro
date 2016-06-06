@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
-import net.torocraft.teletoro.teletory.TeletoryTeleporter;
+import net.torocraft.teletoro.teleporter.TeletoryTeleporter;
 
 public class TeleToroUtil {
 	public static Block getBlock(IBlockAccess world, int i, int j, int k) {

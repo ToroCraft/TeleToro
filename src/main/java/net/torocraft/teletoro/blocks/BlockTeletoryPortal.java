@@ -1,4 +1,4 @@
-package net.torocraft.teletoro.teletory;
+package net.torocraft.teletoro.blocks;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -12,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToroMod;
-import net.torocraft.teletoro.blocks.BlockEnder;
+import net.torocraft.teletoro.Teletory;
 
 public class BlockTeletoryPortal extends BlockAbstractPortal {
 

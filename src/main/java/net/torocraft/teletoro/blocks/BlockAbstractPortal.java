@@ -1,4 +1,4 @@
-package net.torocraft.teletoro.teletory;
+package net.torocraft.teletoro.blocks;
 
 import java.util.Random;
 

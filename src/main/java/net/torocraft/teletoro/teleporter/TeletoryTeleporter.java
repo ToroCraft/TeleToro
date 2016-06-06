@@ -1,4 +1,4 @@
-package net.torocraft.teletoro.teletory;
+package net.torocraft.teletoro.teleporter;
 
 import java.util.Random;
 
@@ -16,7 +16,9 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
+import net.torocraft.teletoro.Teletory;
 import net.torocraft.teletoro.blocks.BlockEnder;
+import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 
 public class TeletoryTeleporter extends Teleporter {
 
