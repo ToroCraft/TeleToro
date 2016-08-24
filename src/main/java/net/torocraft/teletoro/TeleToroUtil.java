@@ -108,6 +108,7 @@ public class TeleToroUtil {
 	}
 
 	public static boolean changePlayerDimension(EntityPlayerMP player, int dimId, TeleportorType type) {
+		System.out.println("Change Dimension Called");
 		if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(player, dimId)) {
 			return false;
 		}

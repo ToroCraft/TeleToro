@@ -117,6 +117,8 @@ public class TeletoryTeleporter extends Teleporter {
 			if (entity instanceof EntityPlayerMP) {
 				((EntityPlayerMP) entity).connection.setPlayerLocation(x, y, z, entity.rotationYaw, entity.rotationPitch);
 			}
+			
+			entity.setPositionAndUpdate(x, y, z);
 			entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
 		}
 	}
