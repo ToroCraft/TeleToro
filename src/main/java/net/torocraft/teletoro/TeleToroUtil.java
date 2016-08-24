@@ -110,9 +110,12 @@ public class TeleToroUtil {
 		if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(player, dimId)) {
 			return false;
 		}
-		// player.getServerWorld(); saw this being used instead
+
+		// saw this being used instead
 		// https://github.com/Spyeedy/Testing-1.8.9/blob/master/com/test/blocks/BlockFlashPortal.java
-		WorldServer world = player.mcServer.worldServerForDimension(dimId);
+		WorldServer world = player.getServerWorld();
+
+		// WorldServer world = player.mcServer.worldServerForDimension(dimId);
 		TeleToroUtil.setInvulnerableDimensionChange(player);
 		player.timeUntilPortal = 10;
 		player.mcServer.getPlayerList().transferPlayerToDimension(player, dimId, getTeleporter(world, type));
