@@ -33,24 +33,23 @@ public class TeleToroUtil {
 	}
 
 	public static TeletoryTeleporter getPortalTeleporter(WorldServer world) {
-		for (Teleporter t : world.customTeleporters) {
-			if (t instanceof TeletoryTeleporter) {
-				return (TeletoryTeleporter) t;
-			}
-		}
+		/*
+		 * for (Teleporter t : world.customTeleporters) { if (t instanceof
+		 * TeletoryTeleporter) { return (TeletoryTeleporter) t; } }
+		 */
 		TeletoryTeleporter t = new TeletoryTeleporter(world);
-		world.customTeleporters.add(t);
+		// world.customTeleporters.add(t);
 		return t;
 	}
 
 	public static FallFromTeletoryTeleporter getFallTeleporter(WorldServer world) {
-		for (Teleporter t : world.customTeleporters) {
-			if (t instanceof FallFromTeletoryTeleporter) {
-				return (FallFromTeletoryTeleporter) t;
-			}
-		}
+		/*
+		 * for (Teleporter t : world.customTeleporters) { if (t instanceof
+		 * FallFromTeletoryTeleporter) { return (FallFromTeletoryTeleporter) t;
+		 * } }
+		 */
 		FallFromTeletoryTeleporter t = new FallFromTeletoryTeleporter(world);
-		world.customTeleporters.add(t);
+		// world.customTeleporters.add(t);
 		return t;
 	}
 
@@ -112,6 +111,8 @@ public class TeleToroUtil {
 		if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(player, dimId)) {
 			return false;
 		}
+		// player.getServerWorld(); saw this being used instead
+		// https://github.com/Spyeedy/Testing-1.8.9/blob/master/com/test/blocks/BlockFlashPortal.java
 		WorldServer world = player.mcServer.worldServerForDimension(dimId);
 		TeleToroUtil.setInvulnerableDimensionChange(player);
 		player.timeUntilPortal = 10;
