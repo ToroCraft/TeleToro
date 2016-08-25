@@ -113,14 +113,14 @@ public class TeletoryTeleporter extends Teleporter {
 		double y = (double) (search.portalPos).getY() + 0.5D;
 		double z = (double) (search.portalPos).getZ() + 0.5D;
 		entity.motionX = entity.motionY = entity.motionZ = 0.0D;
-		if (!world.isRemote) {
+		// if (!world.isRemote) {
 			if (entity instanceof EntityPlayerMP) {
 				((EntityPlayerMP) entity).connection.setPlayerLocation(x, y, z, entity.rotationYaw, entity.rotationPitch);
 			}
 			
 			entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
 			entity.setPositionAndUpdate(x, y, z);
-		}
+		// }
 	}
 
 	private EnumFacing determinePortalDirection(PortalSearchState search) {
