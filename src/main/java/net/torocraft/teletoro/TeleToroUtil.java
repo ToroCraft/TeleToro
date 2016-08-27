@@ -18,7 +18,7 @@ public class TeleToroUtil {
 	}
 
 	public static enum TeleportorType {
-		PORTAL, FALL
+		PORTAL, FALL, POST_TELEPORT
 	};
 
 	public static Teleporter getTeleporter(WorldServer world, TeleportorType type) {
@@ -120,10 +120,16 @@ public class TeleToroUtil {
 		// https://github.com/Spyeedy/Testing-1.8.9/blob/master/com/test/blocks/BlockFlashPortal.java
 		// WorldServer world = player.getServerWorld();
 
+		// player.getServer();
 		WorldServer world = player.mcServer.worldServerForDimension(dimId);
+		
+		Teleporter teleporter = getTeleporter(world, type);
+		
+
+		
 		TeleToroUtil.setInvulnerableDimensionChange(player);
 		player.timeUntilPortal = 10;
-		player.mcServer.getPlayerList().transferPlayerToDimension(player, dimId, getTeleporter(world, type));
+		player.mcServer.getPlayerList().transferPlayerToDimension(player, dimId, teleporter);
 		player.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
 		TeleToroUtil.resetStatusFields(player);
 		return true;

@@ -16,18 +16,17 @@ public class CommonProxy {
     }
 
     public void init(FMLInitializationEvent e) {
-
 		BlockTeletoryPortal.init();
 		BlockEnder.init();
+		setupTheTeletory(e);
+		GameRegistry.addRecipe(new ItemStack(BlockEnder.INSTANCE), "##", "##", '#', Items.ENDER_PEARL);
+	}
 
+	protected void setupTheTeletory(FMLInitializationEvent e) {
 		Teletory teletory = new Teletory();
 		MinecraftForge.EVENT_BUS.register(teletory);
 		Teletory.init(e);
-
-		GameRegistry.addRecipe(new ItemStack(BlockEnder.INSTANCE), "##", "##", '#', Items.ENDER_PEARL);
-
-
-    }
+	}
 
     public void postInit(FMLPostInitializationEvent e) {
 

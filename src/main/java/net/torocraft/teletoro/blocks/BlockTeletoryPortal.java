@@ -1,10 +1,8 @@
 package net.torocraft.teletoro.blocks;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing.Axis;
@@ -12,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToroMod;
+import net.torocraft.teletoro.TeleToroUtil.TeleportorType;
 import net.torocraft.teletoro.Teletory;
 
 public class BlockTeletoryPortal extends BlockAbstractPortal {
@@ -38,6 +37,10 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 		return new BlockTeletoryPortal.Size(worldIn, p_i45694_2_, p_i45694_3_);
 	}
 
+	protected void onPlayerEnterPortal(EntityPlayerMP player) {
+		Teletory.addPlayerInPortal(player.getUniqueID(), TeleportorType.PORTAL);
+	}
+
 	public static class Size extends BlockAbstractPortal.Size {
 
 		public Size(World worldIn, BlockPos p_i45694_2_, Axis p_i45694_3_) {
@@ -49,20 +52,6 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 			return BlockEnder.INSTANCE;
 		}
 
-	}
-
-	@Override
-	public int getNextDimension(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if (entity.dimension != Teletory.DIMID) {
-			return Teletory.DIMID;
-		} else {
-			return 0;
-		}
-	}
-
-	@Override
-	protected void onDimesionChange(int dimId, EntityPlayerMP player) {
-		player.addStat(TeleToroMod.TELETORY_ACHIEVEMNT);
 	}
 
 }

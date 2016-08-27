@@ -31,8 +31,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.torocraft.teletoro.TeleToroUtil;
-import net.torocraft.teletoro.TeleToroUtil.TeleportorType;
 
 public abstract class BlockAbstractPortal extends BlockBreakable {
 	public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis>create("axis", EnumFacing.Axis.class, new EnumFacing.Axis[] { EnumFacing.Axis.X, EnumFacing.Axis.Z });
@@ -156,27 +154,18 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 			return;
 		}
 
-		int par2 = pos.getX();
-		int par3 = pos.getY();
-		int par4 = pos.getZ();
-
-		int nextDimension = getNextDimension(world, pos, state, entity);
-
 		if (entity.timeUntilPortal > 0) {
 			entity.timeUntilPortal = 10;
 		} else if (entity instanceof EntityPlayerMP) {
 			EntityPlayerMP player = (EntityPlayerMP) entity;
+			onPlayerEnterPortal(player);
 			player.timeUntilPortal = 10;
-			TeleToroUtil.changePlayerDimension(player, nextDimension, TeleportorType.PORTAL);
-			onDimesionChange(nextDimension, player);
 		} else {
 			// TODO support non-player entities
 		}
 	}
 
-	protected abstract void onDimesionChange(int dimId, EntityPlayerMP player);
-
-	public abstract int getNextDimension(World world, BlockPos pos, IBlockState state, Entity entity);
+	protected abstract void onPlayerEnterPortal(EntityPlayerMP player);
 
 	@Nullable
 	public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {

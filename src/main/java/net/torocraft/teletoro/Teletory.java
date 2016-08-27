@@ -2,6 +2,12 @@ package net.torocraft.teletoro;
 
 import static net.torocraft.teletoro.TeleToroUtil.getBlock;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityEndermite;
@@ -9,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
@@ -18,6 +25,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
+import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -29,10 +37,16 @@ import net.torocraft.teletoro.world.TeletoryWorldProvider;
 public class Teletory {
 
 	public static int DIMID = 16;
-	public static DimensionType type = DimensionType.register("teletory", "_teletory", DIMID, TeletoryWorldProvider.class, true);
+	public static DimensionType TYPE = DimensionType.register("teletory", "_teletory", DIMID, TeletoryWorldProvider.class, true);
+
+	private static ConcurrentHashMap<UUID, TeleportorType> playersInPortal = new ConcurrentHashMap<UUID, TeleportorType>();
+
+	public static void addPlayerInPortal(UUID playerId, TeleportorType type) {
+		playersInPortal.put(playerId, type);
+	}
 
 	public static void init(FMLInitializationEvent event) {
-		DimensionManager.registerDimension(DIMID, type);
+		DimensionManager.registerDimension(DIMID, TYPE);
 	}
 
 	private boolean isRunTick(World world) {
@@ -56,24 +70,102 @@ public class Teletory {
 	}
 
 	@SubscribeEvent
-	public void feelThePainOfTheTeletory(TickEvent.PlayerTickEvent event) {
-		if (event.player.dimension != Teletory.DIMID || event.player.worldObj.isRemote) {
+	public void limitEnderBlockDropsInTheTeletory(HarvestDropsEvent event) {
+
+		if (!isEnderBlock(event)) {
 			return;
 		}
 
+		EntityPlayer player = event.getHarvester();
+
+		if (player == null || player.dimension != Teletory.DIMID) {
+			return;
+		}
+
+		System.out.println("harvent enderblock in the teletory");
+
+		List<ItemStack> drops = event.getDrops();
+		List<ItemStack> dropsToRemove = new ArrayList<ItemStack>(drops.size());
+
+		Random rand = event.getWorld().rand;
+
+		for (ItemStack drop : drops) {
+			if (rand.nextInt(10) > 2) {
+				dropsToRemove.add(drop);
+			}
+		}
+
+		drops.removeAll(dropsToRemove);
+	}
+
+	private boolean isEnderBlock(HarvestDropsEvent event) {
+		return event.getState().getBlock().getUnlocalizedName().equals("tile.enderBlock");
+	}
+
+	public int getNextDimension(Entity entity) {
+		if (entity.dimension != Teletory.DIMID) {
+			return Teletory.DIMID;
+		} else {
+			return 0;
+		}
+	}
+
+	@SubscribeEvent
+	public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
+
+		if (event.player.worldObj.isRemote) {
+			return;
+		}
+
+		if (playerIsInPortal(event)) {
+			teleportPlayer(event);
+		}
+
+		if (event.player.dimension == Teletory.DIMID) {
+			feelThePainOfTheTeletory(event);
+		}
+	}
+
+	protected void teleportPlayer(TickEvent.PlayerTickEvent event) {
+		EntityPlayerMP player = (EntityPlayerMP) event.player;
+		TeleportorType type = playersInPortal.get(player.getUniqueID());
+		if (TeleportorType.POST_TELEPORT.equals(type)) {
+			phaseTwoTeleport(player);
+		} else {
+			phaseOneTeleport(player, type);
+		}
+	}
+
+	protected void phaseTwoTeleport(EntityPlayerMP player) {
+		if (player.dimension == Teletory.DIMID) {
+			player.addStat(TeleToroMod.TELETORY_ACHIEVEMNT);
+			playersInPortal.remove(player.getUniqueID());
+		}
+	}
+
+	protected void phaseOneTeleport(EntityPlayerMP player, TeleportorType type) {
+		int nextDimension = getNextDimension(player);
+		TeleToroUtil.changePlayerDimension(player, nextDimension, type);
+		playersInPortal.put(player.getUniqueID(), TeleportorType.POST_TELEPORT);
+	}
+
+	protected boolean playerIsInPortal(TickEvent.PlayerTickEvent event) {
+		return event.player instanceof EntityPlayerMP && playersInPortal.containsKey(event.player.getUniqueID());
+	}
+
+	protected void feelThePainOfTheTeletory(TickEvent.PlayerTickEvent event) {
 		if (!(event.player instanceof EntityPlayerMP)) {
 			return;
 		}
 
 		if (event.player.posY < -5) {
-			TeleToroUtil.changePlayerDimension((EntityPlayerMP) event.player, 0, TeleportorType.FALL);
+			addPlayerInPortal(event.player.getUniqueID(), TeleportorType.FALL);
 		}
 
 		if (isRunTick(event.player.worldObj)) {
 			hurtPlayer(event.player);
 			spawnParticles(event.player);
 		}
-
 	}
 
 	private void hurtPlayer(Entity entity) {
@@ -161,6 +253,6 @@ public class Teletory {
 			return;
 		}
 		ev.setCanceled(true);
-		TeleToroUtil.changePlayerDimension(thePlayer, 0, TeleportorType.FALL);
+		addPlayerInPortal(thePlayer.getUniqueID(), TeleportorType.FALL);
 	}
 }

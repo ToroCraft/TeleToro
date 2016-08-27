@@ -31,7 +31,7 @@ public class TeletoryWorldProvider extends WorldProvider {
 	}
 
 	public DimensionType getDimensionType() {
-		return Teletory.type;
+		return Teletory.TYPE;
 	}
 
 	public static final int HEIGHT = 10;
