@@ -6,11 +6,7 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.Lists;
-
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -18,67 +14,53 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunkGenerator;
-import net.minecraft.world.gen.FlatGeneratorInfo;
-import net.minecraft.world.gen.FlatLayerInfo;
-import net.minecraft.world.gen.feature.WorldGenLakes;
-import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.gen.NoiseGeneratorOctaves;
 
 public class TeletoryChunkProvider implements IChunkGenerator {
+
 	private final World world;
 	private final Random random;
-	private final IBlockState[] cachedBlockIDs = new IBlockState[256];
-	private final FlatGeneratorInfo info;
-	private final List<MapGenStructure> structureGenerators = Lists.<MapGenStructure>newArrayList();
-	private final boolean hasDecoration;
-	// private final boolean hasDungeons;
-	private WorldGenLakes waterLakeGenerator;
-	private WorldGenLakes lavaLakeGenerator;
+	private final NoiseGeneratorOctaves noise1;
 
 	public TeletoryChunkProvider(World worldIn, long seed) {
 		world = worldIn;
 		random = new Random(seed);
-
-		info = new FlatGeneratorInfo();
-		info.setBiome(Biome.getIdForBiome(Biomes.HELL));
-		info.getFlatLayers().add(new FlatLayerInfo(2, Blocks.DIRT));
-		info.getFlatLayers().add(new FlatLayerInfo(1, Blocks.END_STONE));
-		info.updateLayers();
-
-		int seaLevel = 0;
-		int k = 0;
-		boolean flag = true;
-
-		for (FlatLayerInfo flatlayerinfo : this.info.getFlatLayers()) {
-
-			for (int y = flatlayerinfo.getMinY(); y < flatlayerinfo.getMinY() + flatlayerinfo.getLayerCount(); ++y) {
-
-				IBlockState iblockstate = flatlayerinfo.getLayerMaterial();
-
-				if (iblockstate.getBlock() != Blocks.AIR) {
-					flag = false;
-					this.cachedBlockIDs[y] = iblockstate;
-				}
-			}
-
-			if (flatlayerinfo.getLayerMaterial().getBlock() == Blocks.AIR) {
-				k += flatlayerinfo.getLayerCount();
-			} else {
-				seaLevel += flatlayerinfo.getLayerCount() + k;
-				k = 0;
-			}
-		}
-
-		worldIn.setSeaLevel(seaLevel);
-		this.hasDecoration = flag && this.info.getBiome() != Biome.getIdForBiome(Biomes.VOID) ? false : this.info.getWorldFeatures().containsKey("decoration");
+		noise1 = new NoiseGeneratorOctaves(random, 8);
 	}
 
 	public Chunk provideChunk(int chunkX, int chunkZ) {
 		ChunkPrimer chunkprimer = new ChunkPrimer();
 
+		// noise1
+
+		// createSimpleRandomIslands(chunkprimer);
+
+		int xOffset = chunkX * 16;
+		int yOffset = 0;
+		int zOffset = chunkZ * 16;
+		int xSize = 16;
+		int ySize = 16;
+		int zSize = 8;
+		int xScale = 1;
+		int yScale = 1;
+		int zScale = 1;
+
+		double[] noiseBuffer = null;
+		noise1.generateNoiseOctaves(noiseBuffer, xOffset, yOffset, zOffset, xSize, ySize, zSize, xScale, yScale, zScale);
+
+		return createChunk(chunkX, chunkZ, chunkprimer);
+	}
+
+	private Chunk createChunk(int chunkX, int chunkZ, ChunkPrimer chunkprimer) {
+		Chunk chunk = new Chunk(world, chunkprimer, chunkX, chunkZ);
+		chunk.generateSkylightMap();
+		return chunk;
+	}
+
+	private void createSimpleRandomIslands(ChunkPrimer chunkprimer) {
 		boolean onIsland = false;
 		int islandX = 0;
 		int islandSize = 0;
-
 		for (int x = 0; x < 16; ++x) {
 			for (int z = 0; z < 16; ++z) {
 				if (continueIsland(onIsland, islandX, x, islandSize) || random.nextInt(100) < 5) {
@@ -91,13 +73,6 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 				}
 			}
 		}
-
-
-
-		Chunk chunk = new Chunk(world, chunkprimer, chunkX, chunkZ);
-
-		chunk.generateSkylightMap();
-		return chunk;
 	}
 
 	protected boolean continueIsland(boolean onIsland, int islandX, int x, int islandSize) {
