@@ -64,7 +64,8 @@ public class TeletoryChunkProviderFromEnd implements IChunkGenerator {
 		this.noiseGen6 = new NoiseGeneratorOctaves(this.rand, 16);
 		this.islandNoise = new NoiseGeneratorSimplex(this.rand);
 
-		net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextEnd ctx = new net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextEnd(lperlinNoise1, lperlinNoise2, perlinNoise1, noiseGen5, noiseGen6, islandNoise);
+		net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextEnd ctx = new net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextEnd(
+				lperlinNoise1, lperlinNoise2, perlinNoise1, noiseGen5, noiseGen6, islandNoise);
 		ctx = net.minecraftforge.event.terraingen.TerrainGen.getModdedNoiseGenerators(worldObjIn, this.rand, ctx);
 		this.lperlinNoise1 = ctx.getLPerlin1();
 		this.lperlinNoise2 = ctx.getLPerlin2();
@@ -213,55 +214,57 @@ public class TeletoryChunkProviderFromEnd implements IChunkGenerator {
 		return chunk;
 	}
 
-	private float getIslandHeightValue(int p_185960_1_, int p_185960_2_, int p_185960_3_, int p_185960_4_) {
-		float f = (float) (p_185960_1_ * 2 + p_185960_3_);
-		float f1 = (float) (p_185960_2_ * 2 + p_185960_4_);
-		float f2 = 100.0F - MathHelper.sqrt_float(f * f + f1 * f1) * 8.0F;
+	private float getIslandHeightValue(int x, int z, int xLoop, int zLoop) {
+		float xVal = (float) (x * 2 + xLoop);
+		float zVal = (float) (z * 2 + zLoop);
+		float magnitude = 100.0F - MathHelper.sqrt_float(xVal * xVal + zVal * zVal) * 8.0F;
 
-		if (f2 > 80.0F) {
-			f2 = 80.0F;
+		if (magnitude > 80.0F) {
+			magnitude = 80.0F;
 		}
 
-		if (f2 < -100.0F) {
-			f2 = -100.0F;
+		if (magnitude < -100.0F) {
+			magnitude = -100.0F;
 		}
 
-		for (int i = -12; i <= 12; ++i) {
-			for (int j = -12; j <= 12; ++j) {
-				long k = (long) (p_185960_1_ + i);
-				long l = (long) (p_185960_2_ + j);
+		for (int xOffset = -12; xOffset <= 12; ++xOffset) {
+			for (int zOffset = -12; zOffset <= 12; ++zOffset) {
+				long xPos = (long) (x + xOffset);
+				long zPos = (long) (z + zOffset);
 
-				if (k * k + l * l > 4096L && this.islandNoise.getValue((double) k, (double) l) < -0.8999999761581421D) {
-					float f3 = (MathHelper.abs((float) k) * 3439.0F + MathHelper.abs((float) l) * 147.0F) % 13.0F + 9.0F;
-					f = (float) (p_185960_3_ - i * 2);
-					f1 = (float) (p_185960_4_ - j * 2);
-					float f4 = 100.0F - MathHelper.sqrt_float(f * f + f1 * f1) * f3;
+				if (xPos * xPos + zPos * zPos > 4096L && this.islandNoise.getValue((double) xPos, (double) zPos) < -0.8999999761581421D) {
+					float f3 = (MathHelper.abs((float) xPos) * 3439.0F + MathHelper.abs((float) zPos) * 147.0F) % 13.0F + 9.0F;
+					xVal = (float) (xLoop - xOffset * 2);
+					zVal = (float) (zLoop - zOffset * 2);
+					float valMagnitude = 100.0F - MathHelper.sqrt_float(xVal * xVal + zVal * zVal) * f3;
 
-					if (f4 > 80.0F) {
-						f4 = 80.0F;
+					if (valMagnitude > 80.0F) {
+						valMagnitude = 80.0F;
 					}
 
-					if (f4 < -100.0F) {
-						f4 = -100.0F;
+					if (valMagnitude < -100.0F) {
+						valMagnitude = -100.0F;
 					}
 
-					if (f4 > f2) {
-						f2 = f4;
+					if (valMagnitude > magnitude) {
+						magnitude = valMagnitude;
 					}
 				}
 			}
 		}
 
-		return f2;
+		return magnitude;
 	}
 
 	public boolean isIslandChunk(int p_185961_1_, int p_185961_2_) {
-		return (long) p_185961_1_ * (long) p_185961_1_ + (long) p_185961_2_ * (long) p_185961_2_ > 4096L && this.getIslandHeightValue(p_185961_1_, p_185961_2_, 1, 1) >= 0.0F;
+		return (long) p_185961_1_ * (long) p_185961_1_ + (long) p_185961_2_ * (long) p_185961_2_ > 4096L
+				&& this.getIslandHeightValue(p_185961_1_, p_185961_2_, 1, 1) >= 0.0F;
 	}
 
 	private double[] getHeights(double[] buffer, int posX, int posY, int posZ, int sizeX, int sizeY, int sizeZ) {
 
-		net.minecraftforge.event.terraingen.ChunkGeneratorEvent.InitNoiseField event = new net.minecraftforge.event.terraingen.ChunkGeneratorEvent.InitNoiseField(this, buffer, posX, posY, posZ, sizeX, sizeY, sizeZ);
+		net.minecraftforge.event.terraingen.ChunkGeneratorEvent.InitNoiseField event = new net.minecraftforge.event.terraingen.ChunkGeneratorEvent.InitNoiseField(
+				this, buffer, posX, posY, posZ, sizeX, sizeY, sizeZ);
 
 		net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
 
@@ -275,22 +278,23 @@ public class TeletoryChunkProviderFromEnd implements IChunkGenerator {
 		double d0 = 684.412D;
 		d0 = d0 * 2.0D;
 
-		this.pnr = this.perlinNoise1.generateNoiseOctaves(this.pnr, posX, posY, posZ, sizeX, sizeY, sizeZ, d0 / 80.0D, 4.277575000000001D, d0 / 80.0D);
+		this.pnr = this.perlinNoise1.generateNoiseOctaves(this.pnr, posX, posY, posZ, sizeX, sizeY, sizeZ, d0 / 80.0D, 4.277575000000001D,
+				d0 / 80.0D);
 		this.ar = this.lperlinNoise1.generateNoiseOctaves(this.ar, posX, posY, posZ, sizeX, sizeY, sizeZ, d0, 684.412D, d0);
 		this.br = this.lperlinNoise2.generateNoiseOctaves(this.br, posX, posY, posZ, sizeX, sizeY, sizeZ, d0, 684.412D, d0);
 
-		int i = posX / 2;
-		int j = posZ / 2;
-		int k = 0;
+		int x = posX / 2;
+		int z = posZ / 2;
+		int y = 0;
 
-		for (int l = 0; l < sizeX; ++l) {
-			for (int i1 = 0; i1 < sizeZ; ++i1) {
-				float f = this.getIslandHeightValue(i, j, l, i1);
+		for (int xLoop = 0; xLoop < sizeX; ++xLoop) {
+			for (int zLoop = 0; zLoop < sizeZ; ++zLoop) {
+				float heightValue = this.getIslandHeightValue(x, z, xLoop, zLoop);
 
-				for (int j1 = 0; j1 < sizeY; ++j1) {
-					double d2 = this.ar[k] / 512.0D;
-					double d3 = this.br[k] / 512.0D;
-					double d5 = (this.pnr[k] / 10.0D + 1.0D) / 2.0D;
+				for (int yLoop = 0; yLoop < sizeY; ++yLoop) {
+					double d2 = this.ar[y] / 512.0D;
+					double d3 = this.br[y] / 512.0D;
+					double d5 = (this.pnr[y] / 10.0D + 1.0D) / 2.0D;
 					double d4;
 
 					if (d5 < 0.0D) {
@@ -302,24 +306,24 @@ public class TeletoryChunkProviderFromEnd implements IChunkGenerator {
 					}
 
 					d4 = d4 - 8.0D;
-					d4 = d4 + (double) f;
+					d4 = d4 + (double) heightValue;
 					int k1 = 2;
 
-					if (j1 > sizeY / 2 - k1) {
-						double d6 = (double) ((float) (j1 - (sizeY / 2 - k1)) / 64.0F);
+					if (yLoop > sizeY / 2 - k1) {
+						double d6 = (double) ((float) (yLoop - (sizeY / 2 - k1)) / 64.0F);
 						d6 = MathHelper.clamp_double(d6, 0.0D, 1.0D);
 						d4 = d4 * (1.0D - d6) + -3000.0D * d6;
 					}
 
 					k1 = 8;
 
-					if (j1 < k1) {
-						double d7 = (double) ((float) (k1 - j1) / ((float) k1 - 1.0F));
+					if (yLoop < k1) {
+						double d7 = (double) ((float) (k1 - yLoop) / ((float) k1 - 1.0F));
 						d4 = d4 * (1.0D - d7) + -30.0D * d7;
 					}
 
-					buffer[k] = d4;
-					++k;
+					buffer[y] = d4;
+					++y;
 				}
 			}
 		}
