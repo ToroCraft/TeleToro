@@ -54,7 +54,7 @@ public class TeletoryWorldProvider extends WorldProvider {
 
 	@Override
 	public IChunkGenerator createChunkGenerator() {
-		return new TeletoryChunkProvider(this.worldObj);
+		return new TeletoryChunkProvider(this.worldObj, this.worldObj.getSeed());
 	}
 
 	@Override
