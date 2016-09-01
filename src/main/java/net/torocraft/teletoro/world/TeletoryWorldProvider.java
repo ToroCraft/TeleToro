@@ -34,7 +34,7 @@ public class TeletoryWorldProvider extends WorldProvider {
 		return Teletory.TYPE;
 	}
 
-	public static final int HEIGHT = 10;
+	public static final int HEIGHT = 32;
 
 	@Override
 	public int getActualHeight() {

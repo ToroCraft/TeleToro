@@ -6,6 +6,8 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.block.BlockDirt;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -15,40 +17,124 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
+import net.torocraft.teletoro.blocks.BlockEnderOre;
 
 public class TeletoryChunkProvider implements IChunkGenerator {
 
 	private final World world;
 	private final Random random;
+
 	private final NoiseGeneratorOctaves noise1;
+	private double[] noiseBuffer;
+
+	// private final NoiseGeneratorOctaves noise2;
+	// private double[] noiseBuffer2;
+
+	private final int xSize = 16;
+	private final int ySize = 3;
+	private final int zSize = 16;
+	private final int xScale = 10;
+	private final int yScale = 20;
+	private final int zScale = 30;
+	private final int yOffset = 0;
+
+	private final IBlockState base = Blocks.END_STONE.getDefaultState();
+	private final IBlockState dirt = Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT);
+	private final IBlockState ore = BlockEnderOre.INSTANCE.getDefaultState();
+	private final IBlockState bush = Blocks.DEADBUSH.getDefaultState();
+	private final IBlockState glow = Blocks.GLOWSTONE.getDefaultState();
+
+	private final int surfaceHeight = 10;
+	private final int surfaceThickness = 3;
+	private final int dirtHeight = surfaceHeight + surfaceThickness - 1;
+
+	private IBlockState block;
 
 	public TeletoryChunkProvider(World worldIn, long seed) {
 		world = worldIn;
 		random = new Random(seed);
 		noise1 = new NoiseGeneratorOctaves(random, 8);
+		// noise2 = new NoiseGeneratorOctaves(random, 16);
 	}
 
 	public Chunk provideChunk(int chunkX, int chunkZ) {
 		ChunkPrimer chunkprimer = new ChunkPrimer();
-
-		// noise1
-
-		// createSimpleRandomIslands(chunkprimer);
-
 		int xOffset = chunkX * 16;
-		int yOffset = 0;
 		int zOffset = chunkZ * 16;
-		int xSize = 16;
-		int ySize = 16;
-		int zSize = 8;
-		int xScale = 1;
-		int yScale = 1;
-		int zScale = 1;
-
-		double[] noiseBuffer = null;
-		noise1.generateNoiseOctaves(noiseBuffer, xOffset, yOffset, zOffset, xSize, ySize, zSize, xScale, yScale, zScale);
-
+		noiseBuffer = noise1.generateNoiseOctaves(noiseBuffer, xOffset, yOffset, zOffset, xSize, ySize, zSize, xScale, yScale, zScale);
+		// noiseBuffer2 = noise2.generateNoiseOctaves(noiseBuffer, xOffset,
+		// yOffset, zOffset, xSize, 2, zSize, 50, 50, 50);
+		drawNoise(chunkprimer);
 		return createChunk(chunkX, chunkZ, chunkprimer);
+	}
+
+	private void drawNoise(ChunkPrimer chunkprimer) {
+		int pointer = 0;
+		for (int x = 0; x < 16; x++) {
+			for (int z = 0; z < 16; z++) {
+				for (int y = 0; y < surfaceThickness; y++) {
+					if (noiseBuffer[pointer] > 60d) {
+						setBlock(chunkprimer, x, y + surfaceHeight, z);
+					}
+					pointer++;
+				}
+			}
+		}
+
+		// drawTwoGlowLayers(chunkprimer);
+
+	}
+
+	protected void drawTwoGlowLayers(ChunkPrimer chunkprimer) {
+		for (int x = 0; x < 16; x++) {
+			for (int z = 0; z < 16; z++) {
+				if (random.nextInt(1000) > 988) {
+					chunkprimer.setBlockState(x, surfaceHeight - 3, z, glow);
+				}
+				if (random.nextInt(1000) > 988) {
+					chunkprimer.setBlockState(x, surfaceHeight + 7, z, glow);
+				}
+			}
+		}
+	}
+
+	/*
+	 * end dirt
+	 * 
+	 * ender ore
+	 * 
+	 * portal linker
+	 * 
+	 * portal to end and nether -- need conf option?
+	 * 
+	 * 
+	 */
+
+	protected void setBlock(ChunkPrimer chunkprimer, int x, int y, int z) {
+
+		if (y == dirtHeight) {
+			if (isAir(chunkprimer, x, y - 1, z)) {
+				block = base;
+			} else {
+				block = dirt;
+			}
+		} else {
+			if (random.nextInt(100) > 92) {
+				block = ore;
+			} else {
+				block = base;
+			}
+		}
+
+		chunkprimer.setBlockState(x, y, z, block);
+
+		if (block == dirt && random.nextInt(100) > 80) {
+			chunkprimer.setBlockState(x, y + 1, z, bush);
+		}
+	}
+
+	protected boolean isAir(ChunkPrimer chunkprimer, int x, int y, int z) {
+		return chunkprimer.getBlockState(x, y, z) == null || chunkprimer.getBlockState(x, y, z) == Blocks.AIR.getDefaultState();
 	}
 
 	private Chunk createChunk(int chunkX, int chunkZ, ChunkPrimer chunkprimer) {
@@ -57,40 +143,10 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 		return chunk;
 	}
 
-	private void createSimpleRandomIslands(ChunkPrimer chunkprimer) {
-		boolean onIsland = false;
-		int islandX = 0;
-		int islandSize = 0;
-		for (int x = 0; x < 16; ++x) {
-			for (int z = 0; z < 16; ++z) {
-				if (continueIsland(onIsland, islandX, x, islandSize) || random.nextInt(100) < 5) {
-					for (int y = 0; y < 3; y++) {
-						chunkprimer.setBlockState(x, y, z, Blocks.END_STONE.getDefaultState());
-						onIsland = true;
-						islandX = x;
-						islandSize = 5;
-					}
-				}
-			}
-		}
-	}
-
-	protected boolean continueIsland(boolean onIsland, int islandX, int x, int islandSize) {
-		if (islandSize <= 0) {
-			onIsland = false;
-			return false;
-		}
-		islandSize--;
-		return onIsland && islandX == x;
-	}
-
 	public void populate(int chunkX, int chunkZ) {
 		net.minecraft.block.BlockFalling.fallInstantly = true;
-
 		setChunkSeed(chunkX, chunkZ);
-
 		net.minecraftforge.event.ForgeEventFactory.onChunkPopulate(true, this, this.world, this.random, chunkX, chunkZ, false);
-
 		net.minecraftforge.event.ForgeEventFactory.onChunkPopulate(false, this, this.world, this.random, chunkX, chunkZ, false);
 		net.minecraft.block.BlockFalling.fallInstantly = false;
 	}

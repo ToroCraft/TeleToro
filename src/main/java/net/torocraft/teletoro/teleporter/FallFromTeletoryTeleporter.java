@@ -27,6 +27,7 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 	}
 
 	public boolean placeInExistingPortal(Entity entity, float rotationYaw) {
+
 		PortalSearchState search = new PortalSearchState(entity, world);
 		BlockPos placement = findTopOfWorld(search);
 

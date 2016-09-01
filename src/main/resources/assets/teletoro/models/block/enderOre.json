@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "down": "teletoro:blocks/ender_ore",
+        "up": "teletoro:blocks/ender_ore",
+        "north": "teletoro:blocks/ender_ore",
+        "south": "teletoro:blocks/ender_ore",
+        "east": "teletoro:blocks/ender_ore",
+        "west": "teletoro:blocks/ender_ore",
+        "particle": "teletoro:blocks/ender_ore"
+    }
+}
