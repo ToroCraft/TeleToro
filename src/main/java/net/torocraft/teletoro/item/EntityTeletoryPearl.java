@@ -10,13 +10,36 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.torocraft.teletoro.TeleToroMod;
 import net.torocraft.teletoro.TeleToroUtil;
 import net.torocraft.teletoro.TeleToroUtil.TeleportorType;
 import net.torocraft.teletoro.Teletory;
 
 public class EntityTeletoryPearl extends EntityThrowable {
+
+	/*
+	 * TODO
+	 * 
+	 * this.entityRenderMap.put(EntityEnderPearl.class, new RenderSnowball(this,
+	 * Items.ENDER_PEARL, itemRendererIn));
+	 * 
+	 * 
+	 * EntityTracker.class :: else if (entityIn instanceof EntityEnderPearl) {
+	 * this.addEntityToTracker(entityIn, 64, 10, true); }
+	 * 
+	 * 
+	 * EntityEnderPearl.registerFixesEnderPearl(datafixer);
+	 */
+
+	public static String NAME = "ThrownTeletorypearl";
+
+	public static void init(int entityId) {
+		EntityRegistry.registerModEntity(EntityTeletoryPearl.class, NAME, entityId, TeleToroMod.instance, 60, 2, true);
+	}
+
 	private EntityLivingBase thrower;
 
 	public EntityTeletoryPearl(World worldIn) {

@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.blocks.BlockEnder;
 import net.torocraft.teletoro.blocks.BlockEnderOre;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
+import net.torocraft.teletoro.item.ItemTeletoryPearl;
 
 public class CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
@@ -20,6 +21,7 @@ public class CommonProxy {
 		BlockTeletoryPortal.init();
 		BlockEnder.init();
 		BlockEnderOre.init();
+		ItemTeletoryPearl.init();
 		setupTheTeletory(e);
 		GameRegistry.addRecipe(new ItemStack(BlockEnder.INSTANCE), "##", "##", '#', Items.ENDER_PEARL);
 		GameRegistry.addSmelting(BlockEnderOre.ITEM_INSTANCE, new ItemStack(Items.ENDER_PEARL), 1);
