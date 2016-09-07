@@ -96,12 +96,12 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 
 		if (axis == EnumFacing.Axis.X) {
 			BlockAbstractPortal.Size sizer = getSizer(worldIn, pos, EnumFacing.Axis.X);
-			if (!sizer.isValid()) {
+			if (!sizer.isValid() || sizer.portalBlockCount < sizer.width * sizer.height) {
 				worldIn.setBlockState(pos, Blocks.AIR.getDefaultState());
 			}
 		} else if (axis == EnumFacing.Axis.Z) {
 			BlockAbstractPortal.Size sizer = getSizer(worldIn, pos, EnumFacing.Axis.Z);
-			if (!sizer.isValid()) {
+			if (!sizer.isValid() || sizer.portalBlockCount < sizer.width * sizer.height) {
 				worldIn.setBlockState(pos, Blocks.AIR.getDefaultState());
 			}
 		}
