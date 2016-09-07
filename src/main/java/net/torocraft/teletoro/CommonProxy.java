@@ -10,21 +10,24 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.blocks.BlockEnder;
 import net.torocraft.teletoro.blocks.BlockEnderOre;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
+import net.torocraft.teletoro.item.EntityTeletoryPearl;
 import net.torocraft.teletoro.item.ItemTeletoryPearl;
 
 public class CommonProxy {
-    public void preInit(FMLPreInitializationEvent e) {
+	public void preInit(FMLPreInitializationEvent e) {
 
-    }
+	}
 
-    public void init(FMLInitializationEvent e) {
+	public void init(FMLInitializationEvent e) {
 		BlockTeletoryPortal.init();
 		BlockEnder.init();
 		BlockEnderOre.init();
 		ItemTeletoryPearl.init();
+		EntityTeletoryPearl.init(150);
 		setupTheTeletory(e);
 		GameRegistry.addRecipe(new ItemStack(BlockEnder.INSTANCE), "##", "##", '#', Items.ENDER_PEARL);
-		GameRegistry.addSmelting(BlockEnderOre.ITEM_INSTANCE, new ItemStack(Items.ENDER_PEARL), 1);
+		GameRegistry.addSmelting(BlockEnderOre.ITEM_INSTANCE, new ItemStack(ItemTeletoryPearl.INSTANCE), 1);
+		GameRegistry.addSmelting(new ItemStack(ItemTeletoryPearl.INSTANCE), new ItemStack(Items.ENDER_PEARL), 1);
 	}
 
 	protected void setupTheTeletory(FMLInitializationEvent e) {
@@ -33,7 +36,7 @@ public class CommonProxy {
 		Teletory.init(e);
 	}
 
-    public void postInit(FMLPostInitializationEvent e) {
+	public void postInit(FMLPostInitializationEvent e) {
 
-    }
+	}
 }

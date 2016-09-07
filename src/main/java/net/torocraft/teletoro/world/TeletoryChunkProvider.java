@@ -27,9 +27,6 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 	private final NoiseGeneratorOctaves noise1;
 	private double[] noiseBuffer;
 
-	// private final NoiseGeneratorOctaves noise2;
-	// private double[] noiseBuffer2;
-
 	private final int xSize = 16;
 	private final int ySize = 3;
 	private final int zSize = 16;
@@ -42,11 +39,10 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 	private final IBlockState dirt = Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT);
 	private final IBlockState ore = BlockEnderOre.INSTANCE.getDefaultState();
 	private final IBlockState bush = Blocks.DEADBUSH.getDefaultState();
-	private final IBlockState glow = Blocks.GLOWSTONE.getDefaultState();
 
-	private final int surfaceHeight = 10;
-	private final int surfaceThickness = 3;
-	private final int dirtHeight = surfaceHeight + surfaceThickness - 1;
+	public static final int surfaceHeight = 10;
+	public static final int surfaceThickness = 3;
+	public static final int dirtHeight = surfaceHeight + surfaceThickness - 1;
 
 	private IBlockState block;
 
@@ -54,7 +50,6 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 		world = worldIn;
 		random = new Random(seed);
 		noise1 = new NoiseGeneratorOctaves(random, 8);
-		// noise2 = new NoiseGeneratorOctaves(random, 16);
 	}
 
 	public Chunk provideChunk(int chunkX, int chunkZ) {
@@ -62,8 +57,6 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 		int xOffset = chunkX * 16;
 		int zOffset = chunkZ * 16;
 		noiseBuffer = noise1.generateNoiseOctaves(noiseBuffer, xOffset, yOffset, zOffset, xSize, ySize, zSize, xScale, yScale, zScale);
-		// noiseBuffer2 = noise2.generateNoiseOctaves(noiseBuffer, xOffset,
-		// yOffset, zOffset, xSize, 2, zSize, 50, 50, 50);
 		drawNoise(chunkprimer);
 		return createChunk(chunkX, chunkZ, chunkprimer);
 	}
@@ -80,35 +73,7 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 				}
 			}
 		}
-
-		// drawTwoGlowLayers(chunkprimer);
-
 	}
-
-	protected void drawTwoGlowLayers(ChunkPrimer chunkprimer) {
-		for (int x = 0; x < 16; x++) {
-			for (int z = 0; z < 16; z++) {
-				if (random.nextInt(1000) > 988) {
-					chunkprimer.setBlockState(x, surfaceHeight - 3, z, glow);
-				}
-				if (random.nextInt(1000) > 988) {
-					chunkprimer.setBlockState(x, surfaceHeight + 7, z, glow);
-				}
-			}
-		}
-	}
-
-	/*
-	 * end dirt
-	 * 
-	 * ender ore
-	 * 
-	 * portal linker
-	 * 
-	 * portal to end and nether -- need conf option?
-	 * 
-	 * 
-	 */
 
 	protected void setBlock(ChunkPrimer chunkprimer, int x, int y, int z) {
 
@@ -119,7 +84,7 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 				block = dirt;
 			}
 		} else {
-			if (random.nextInt(100) > 92) {
+			if (random.nextInt(100) > 85) {
 				block = ore;
 			} else {
 				block = base;

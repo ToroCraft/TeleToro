@@ -38,7 +38,7 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 	}
 
 	protected void onPlayerEnterPortal(EntityPlayerMP player) {
-		Teletory.addPlayerInPortal(player.getUniqueID(), TeleportorType.PORTAL);
+		Teletory.changeEntityDimension(player, TeleportorType.PORTAL);
 	}
 
 	public static class Size extends BlockAbstractPortal.Size {

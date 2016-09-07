@@ -36,7 +36,6 @@ public class TeletoryTeleporter extends Teleporter {
 	}
 
 	public void placeInPortal(Entity entityIn, float rotationYaw) {
-		System.out.println("placeInPortal");
 		if (!placeInExistingPortal(entityIn, rotationYaw)) {
 			makePortal(entityIn);
 			placeInExistingPortal(entityIn, rotationYaw);
@@ -44,7 +43,6 @@ public class TeletoryTeleporter extends Teleporter {
 	}
 
 	public boolean placeInExistingPortal(Entity entity, float rotationYaw) {
-		System.out.println("placeInExistingPortal");
 		PortalSearchState state = new PortalSearchState(entity, world);
 
 		if (portalIsCached(state.longXZPair)) {
@@ -166,7 +164,6 @@ public class TeletoryTeleporter extends Teleporter {
 
 	@Override
 	public boolean makePortal(Entity e) {
-		System.out.println("makePortal");
 		if (e.dimension == Teletory.DIMID) {
 			return makePortalOnPlatform(e);
 		}
@@ -174,7 +171,6 @@ public class TeletoryTeleporter extends Teleporter {
 	}
 
 	public boolean makePortalOnPlatform(Entity e) {
-		System.out.println("makePortalOnPlatform");
 		PortalSearchState search = new PortalSearchState(e, world);
 		int x = search.xSearch;
 		int y = 13;
@@ -185,7 +181,6 @@ public class TeletoryTeleporter extends Teleporter {
 	}
 
 	public boolean makePortalOnExistingGround(Entity e) {
-		System.out.println("makePortalOnExistingGround");
 		PortalSearchState search = new PortalSearchState(e, world);
 
 		byte b0 = 16;
@@ -349,13 +344,14 @@ public class TeletoryTeleporter extends Teleporter {
 	}
 
 	private void buildPortalFloor(int x, int y, int z) {
-		int size = 4;
+
 		int y1 = y - 1;
 		BlockPos pos;
 
-		for (int x1 = -(size / 2); x1 < size / 2; x1++) {
-			for (int z1 = -size / 2; z1 < size / 2; z1++) {
+		for (int x1 = -1; x1 < 1; x1++) {
+			for (int z1 = -1; z1 < 2; z1++) {
 				pos = new BlockPos(x1 + x + 1, y1, z1 + z);
+
 				if (!world.isSideSolid(pos, EnumFacing.UP)) {
 					world.setBlockState(pos, Blocks.END_STONE.getDefaultState());
 				}

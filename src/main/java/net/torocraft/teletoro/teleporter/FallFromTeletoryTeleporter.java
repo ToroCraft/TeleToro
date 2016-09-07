@@ -11,10 +11,8 @@ import net.torocraft.teletoro.Teletory;
 
 public class FallFromTeletoryTeleporter extends Teleporter {
 
-
-
-	private final WorldServer world;
-	private final Random random;
+	protected final WorldServer world;
+	protected final Random random;
 
 	public FallFromTeletoryTeleporter(WorldServer worldIn) {
 		super(worldIn);
@@ -27,12 +25,32 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 	}
 
 	public boolean placeInExistingPortal(Entity entity, float rotationYaw) {
-
 		PortalSearchState search = new PortalSearchState(entity, world);
+		if (entity.dimension == Teletory.DIMID) {
+			return fallIntoTeletory(entity, rotationYaw, search);
+		} else {
+			return fallIntoOverWorld(entity, rotationYaw, search);
+		}
+	}
+
+	protected boolean fallIntoTeletory(Entity entity, float rotationYaw, PortalSearchState search) {
+
+		double x = MathHelper.floor_double(search.xEntity);
+		double y = 25;
+		double z = MathHelper.floor_double(search.zEntity);
+
+		entity.fallDistance = 0;
+		entity.velocityChanged = true;
+
+		entity.setLocationAndAngles(x, y, z, rotationYaw, -5);
+		return true;
+	}
+
+	protected boolean fallIntoOverWorld(Entity entity, float rotationYaw, PortalSearchState search) {
 		BlockPos placement = findTopOfWorld(search);
 
 		double x = placement.getX() + 0.5D;
-		double y = placement.getY() + 0.5D;
+		double y = placement.getY() + 14 + random.nextInt(4);
 		double z = placement.getZ() + 0.5D;
 
 		double speed = 10;
@@ -42,7 +60,7 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 
 		entity.motionX = xVel;
 		entity.motionZ = zVel;
-		entity.motionY = 1;
+		entity.motionY = 0;
 		entity.fallDistance = 0;
 		entity.velocityChanged = true;
 
@@ -50,20 +68,18 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 		return true;
 	}
 
-	private BlockPos findTopOfWorld(PortalSearchState search) {
+	protected BlockPos findTopOfWorld(PortalSearchState search) {
 		int xSearch = MathHelper.floor_double(search.xEntity);
 		int zSearch = MathHelper.floor_double(search.zEntity);
-
-		int fallDistance = 6 + random.nextInt(10);
 
 		BlockPos searchPos = new BlockPos(xSearch, world.getActualHeight() - 1, zSearch);
 		while (searchPos.getY() >= 0) {
 			if (!world.isAirBlock(searchPos)) {
-				return searchPos.add(0, fallDistance, 0);
+				return searchPos;
 			}
 			searchPos = searchPos.down();
 		}
-		return new BlockPos(xSearch, world.getActualHeight() - 1 + fallDistance, zSearch);
+		return searchPos;
 	}
 
 	public boolean makePortal(Entity e) {
