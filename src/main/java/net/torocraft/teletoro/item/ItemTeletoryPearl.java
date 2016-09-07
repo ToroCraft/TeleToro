@@ -26,11 +26,11 @@ public class ItemTeletoryPearl extends Item {
 	public static void init() {
 		INSTANCE = new ItemTeletoryPearl();
 		GameRegistry.registerItem(INSTANCE, NAME);
-		ModelResourceLocation model = new ModelResourceLocation(TeleToroMod.MODID + ":" + NAME, "inventory");
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(INSTANCE, 0, model);
 	}
 
 	public static void registerRenders() {
+		ModelResourceLocation model = new ModelResourceLocation(TeleToroMod.MODID + ":" + NAME, "inventory");
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(INSTANCE, 0, model);
 		RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
 		renderItem.getItemModelMesher().register(INSTANCE, 0, new ModelResourceLocation(TeleToroMod.MODID + ":" + NAME, "inventory"));
 	}
