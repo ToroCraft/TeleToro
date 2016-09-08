@@ -382,12 +382,11 @@ public class Teletory {
 
 		Class<? extends Teleporter> clazz = getTeleporterClass(type);
 
-		/*
-		 * TODO: add this back after further testing of the teletporter logic
-		 * 
-		 * for (Teleporter t : world.customTeleporters) { if
-		 * (t.getClass().getName().equals(clazz.getName())) { return t; } }
-		 */
+		for (Teleporter t : world.customTeleporters) {
+			if (t.getClass().getName().equals(clazz.getName())) {
+				return t;
+			}
+		}
 
 		Teleporter t = getNewTeleporterInstance(world, type);
 		world.customTeleporters.add(t);

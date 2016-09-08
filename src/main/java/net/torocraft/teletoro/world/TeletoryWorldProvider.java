@@ -14,10 +14,9 @@ import net.torocraft.teletoro.Teletory;
 public class TeletoryWorldProvider extends WorldProvider {
 
 	public TeletoryWorldProvider() {
-		this.biomeProvider = new BiomeProviderSingle(Biomes.HELL);
-		this.isHellWorld = true;
+		this.biomeProvider = new BiomeProviderSingle(Biomes.VOID);
+		this.isHellWorld = false;
 		this.hasNoSky = true;
-
 	}
 
 	@Override
