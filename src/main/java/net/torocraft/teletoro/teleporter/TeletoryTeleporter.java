@@ -23,7 +23,7 @@ import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 public class TeletoryTeleporter extends Teleporter {
 
 	public static final int TRAVEL_FACTOR = 64;
-	private static final int PORTAL_SEARCH_RADIUS = 128;
+	private static final int PORTAL_SEARCH_RADIUS = 200;
 
 	private final WorldServer world;
 	private final Random random;
@@ -73,7 +73,7 @@ public class TeletoryTeleporter extends Teleporter {
 		int searchRadius = PORTAL_SEARCH_RADIUS;
 
 		if (world.provider.getDimension() == Teletory.DIMID) {
-			searchRadius = 2;
+			searchRadius = 4;
 		}
 
 		for (int x = -searchRadius; x <= searchRadius; ++x) {
