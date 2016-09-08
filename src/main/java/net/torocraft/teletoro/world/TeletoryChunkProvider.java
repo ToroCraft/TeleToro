@@ -28,11 +28,13 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 	private double[] noiseBuffer;
 
 	private final int xSize = 16;
-	private final int ySize = 3;
+	private final int ySize = surfaceThickness;
 	private final int zSize = 16;
-	private final int xScale = 10;
-	private final int yScale = 20;
-	private final int zScale = 30;
+
+	private final int xScale = 5;
+	private final int yScale = 6;
+	private final int zScale = 15;
+
 	private final int yOffset = 0;
 
 	private final IBlockState base = Blocks.END_STONE.getDefaultState();
@@ -40,9 +42,9 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 	private final IBlockState ore = BlockEnderOre.INSTANCE.getDefaultState();
 	private final IBlockState bush = Blocks.DEADBUSH.getDefaultState();
 
-	public static final int surfaceHeight = 10;
-	public static final int surfaceThickness = 3;
-	public static final int dirtHeight = surfaceHeight + surfaceThickness - 1;
+	public static final int surfaceHeight = 8;
+	public static final int surfaceThickness = 5;
+	public static final int dirtHeight = surfaceHeight + surfaceThickness - 2;
 
 	private IBlockState block;
 
@@ -66,7 +68,9 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				for (int y = 0; y < surfaceThickness; y++) {
-					if (noiseBuffer[pointer] > 60d) {
+					// if (noiseBuffer[pointer] > (60d - (10 * (surfaceThickness
+					// - y)))) {
+					if (noiseBuffer[pointer] > (70d - (8 * (surfaceThickness - y)))) {
 						setBlock(chunkprimer, x, y + surfaceHeight, z);
 					}
 					pointer++;
@@ -77,7 +81,7 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 
 	protected void setBlock(ChunkPrimer chunkprimer, int x, int y, int z) {
 
-		if (y == dirtHeight) {
+		if (y >= dirtHeight) {
 			if (isAir(chunkprimer, x, y - 1, z)) {
 				block = base;
 			} else {

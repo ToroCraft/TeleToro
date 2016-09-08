@@ -16,7 +16,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.SPacketEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
@@ -72,29 +71,11 @@ public class Teletory {
 				EntityPlayerMP player = (EntityPlayerMP) entity;
 				int nextDimension = getNextDimension(player);
 				changePlayerDimension(player, nextDimension, type);
+				runQueue.put(new AchievementRunner((EntityPlayerMP) entity), 0);
 			} else {
 				// TODO: support teleporting non-players
 				// wip_fakeTeletportNonPlayer(entity);
 			}
-		}
-
-		protected void wip_fakeTeletportNonPlayer(final Entity entity) {
-			entity.setInvisible(true);
-
-			particles();
-
-			runQueue.put(new Runnable() {
-				public void run() {
-					entity.setPositionAndUpdate(entity.lastTickPosX, entity.lastTickPosY + 10, entity.posZ);
-					runQueue.put(new Runnable() {
-						public void run() {
-							entity.setVelocity(4, 1, 0);
-							entity.setInvisible(false);
-							particles();
-						}
-					}, 20);
-				}
-			}, 0);
 		}
 
 		private void particles() {
@@ -106,12 +87,32 @@ public class Teletory {
 		}
 	}
 
+	private static class AchievementRunner implements Runnable {
+
+		private final EntityPlayerMP player;
+
+		public AchievementRunner(EntityPlayerMP player) {
+			this.player = player;
+		}
+
+		@Override
+		public void run() {
+			if (player == null) {
+				return;
+			}
+
+			if (player.dimension == Teletory.DIMID) {
+				player.addStat(TeleToroMod.TELETORY_ACHIEVEMNT);
+			}
+		}
+	}
+
 	public static void init(FMLInitializationEvent event) {
 		DimensionManager.registerDimension(DIMID, TYPE);
 	}
 
 	private boolean isRunTick(World world) {
-		return world.getTotalWorldTime() % 40L == 0L;
+		return world.getTotalWorldTime() % 60L == 0L;
 	}
 
 	@SubscribeEvent
@@ -235,7 +236,7 @@ public class Teletory {
 		entity.fallDistance = 0.0F;
 		entity.attackEntityFrom(DamageSource.fall, 4f);
 
-		if (entity.worldObj.rand.nextFloat() < 0.015F && entity.worldObj.getGameRules().getBoolean("doMobSpawning")) {
+		if (entity.worldObj.rand.nextFloat() < 0.005F && entity.worldObj.getGameRules().getBoolean("doMobSpawning")) {
 			EntityEndermite entityendermite = new EntityEndermite(entity.worldObj);
 			entityendermite.setSpawnedByPlayer(true);
 			entityendermite.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
@@ -335,7 +336,8 @@ public class Teletory {
 		TeleToroUtil.setInvulnerableDimensionChange(player);
 		player.timeUntilPortal = 10;
 		player.mcServer.getPlayerList().transferPlayerToDimension(player, dimId, teleporter);
-		player.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
+		// player.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN,
+		// 0, false));
 		TeleToroUtil.resetStatusFields(player);
 		return true;
 	}
@@ -380,11 +382,13 @@ public class Teletory {
 
 		Class<? extends Teleporter> clazz = getTeleporterClass(type);
 
-		for (Teleporter t : world.customTeleporters) {
-			if (t.getClass().getName().equals(clazz.getName())) {
-				return t;
-			}
-		}
+		/*
+		 * TODO: add this back after further testing of the teletporter logic
+		 * 
+		 * for (Teleporter t : world.customTeleporters) { if
+		 * (t.getClass().getName().equals(clazz.getName())) { return t; } }
+		 */
+
 		Teleporter t = getNewTeleporterInstance(world, type);
 		world.customTeleporters.add(t);
 		return t;
