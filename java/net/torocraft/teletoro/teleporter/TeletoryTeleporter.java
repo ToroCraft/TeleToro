@@ -385,7 +385,7 @@ public class TeletoryTeleporter extends Teleporter {
 					x = xIn + (k3 - 1) * l5;
 					y = yIn + l3;
 					z = zIn + (k3 - 1) * l2;
-					this.world.notifyNeighborsOfStateChange(new BlockPos(x, y, z), this.world.getBlockState(new BlockPos(x, y, z)).getBlock());
+					this.world.notifyNeighborsOfStateChange(new BlockPos(x, y, z), this.world.getBlockState(new BlockPos(x, y, z)).getBlock(), false);
 				}
 			}
 		}
@@ -413,7 +413,7 @@ public class TeletoryTeleporter extends Teleporter {
 
 			if (world.provider.getDimension() == Teletory.DIMID) {
 
-				longXZPair = ChunkPos.chunkXZ2Int(MathHelper.floor_double(entity.posX), MathHelper.floor_double(entity.posZ));
+				longXZPair = ChunkPos.asLong(MathHelper.floor_double(entity.posX), MathHelper.floor_double(entity.posZ));
 
 				xEntity = entity.posX / TRAVEL_FACTOR;
 				yEntity = entity.posY;
@@ -431,7 +431,7 @@ public class TeletoryTeleporter extends Teleporter {
 				xSearch = MathHelper.floor_double(xEntity);
 				zSearch = MathHelper.floor_double(zEntity);
 
-				longXZPair = ChunkPos.chunkXZ2Int(xSearch, zSearch);
+				longXZPair = ChunkPos.asLong(xSearch, zSearch);
 			}
 
 		}

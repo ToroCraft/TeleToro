@@ -12,8 +12,10 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -36,12 +38,17 @@ public class BlockEnder extends Block {
 
 	public static Item ITEM_INSTANCE;
 
-	public static final String NAME = "enderBlock";
+	public static final String NAME = "enderblock";
 
 	public static void init() {
 		INSTANCE = new BlockEnder();
-		GameRegistry.registerBlock(INSTANCE, NAME);
-		ITEM_INSTANCE = GameRegistry.findItem(TeleToroMod.MODID, NAME);
+		ResourceLocation resourceName = new ResourceLocation(TeleToroMod.MODID, NAME);
+		INSTANCE.setRegistryName(resourceName);
+		GameRegistry.register(INSTANCE);
+
+		ITEM_INSTANCE = new ItemBlock(INSTANCE);
+		ITEM_INSTANCE.setRegistryName(resourceName);
+		GameRegistry.register(ITEM_INSTANCE);
 	}
 
 	public static void registerRenders() {

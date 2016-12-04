@@ -42,8 +42,8 @@ import net.torocraft.teletoro.world.TeletoryWorldProvider;
 
 public class Teletory {
 
-	public static int DIMID = 16;
-	public static DimensionType TYPE = DimensionType.register("teletory", "_teletory", DIMID, TeletoryWorldProvider.class, true);
+	public static final int DIMID = 16;
+	public static final DimensionType TYPE = DimensionType.register("teletory", "_teletory", DIMID, TeletoryWorldProvider.class, true);
 
 	private static ConcurrentHashMap<Runnable, Integer> runQueue = new ConcurrentHashMap<Runnable, Integer>();
 

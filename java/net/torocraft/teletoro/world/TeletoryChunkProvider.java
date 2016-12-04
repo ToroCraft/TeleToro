@@ -143,4 +143,9 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 	public void recreateStructures(Chunk chunkIn, int x, int z) {
 
 	}
+
+	@Override
+	public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position, boolean p_180513_4_) {
+		return null;
+	}
 }

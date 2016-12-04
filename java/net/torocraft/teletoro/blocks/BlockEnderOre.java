@@ -12,6 +12,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToroMod;
 
@@ -21,12 +23,17 @@ public class BlockEnderOre extends Block {
 
 	public static Item ITEM_INSTANCE;
 
-	public static final String NAME = "enderOre";
+	public static final String NAME = "enderore";
 
 	public static void init() {
 		INSTANCE = new BlockEnderOre();
-		GameRegistry.registerBlock(INSTANCE, NAME);
-		ITEM_INSTANCE = GameRegistry.findItem(TeleToroMod.MODID, NAME);
+		ResourceLocation resourceName = new ResourceLocation(TeleToroMod.MODID, NAME);
+		INSTANCE.setRegistryName(resourceName);
+		GameRegistry.register(INSTANCE);
+
+		ITEM_INSTANCE = new ItemBlock(INSTANCE);
+		ITEM_INSTANCE.setRegistryName(resourceName);
+		GameRegistry.register(ITEM_INSTANCE);
 	}
 
 	public static void registerRenders() {

@@ -5,7 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -19,12 +21,17 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 
 	public static Item ITEM_INSTANCE;
 
-	public static final String NAME = "teletoryPortalBlock";
+	public static final String NAME = "teletoryportalblock";
 
 	public static void init() {
 		INSTANCE = (BlockTeletoryPortal) new BlockTeletoryPortal().setUnlocalizedName(NAME);
-		GameRegistry.registerBlock(INSTANCE, NAME);
-		ITEM_INSTANCE = GameRegistry.findItem(TeleToroMod.MODID, NAME);
+		ResourceLocation resourceName = new ResourceLocation(TeleToroMod.MODID, NAME);
+		INSTANCE.setRegistryName(resourceName);
+		GameRegistry.register(INSTANCE);
+
+		ITEM_INSTANCE = new ItemBlock(INSTANCE);
+		ITEM_INSTANCE.setRegistryName(resourceName);
+		GameRegistry.register(ITEM_INSTANCE);
 	}
 
 	public static void registerRenders() {
