@@ -12,6 +12,8 @@ import net.torocraft.teletoro.blocks.BlockEnderOre;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 import net.torocraft.teletoro.item.EntityTeletoryPearl;
 import net.torocraft.teletoro.item.ItemTeletoryPearl;
+import net.torocraft.teletoro.item.armor.ItemEnderArmor;
+import net.torocraft.teletoro.material.ArmorMaterials;
 
 public class CommonProxy {
 	public void preInit(FMLPreInitializationEvent e) {
@@ -19,9 +21,12 @@ public class CommonProxy {
 	}
 
 	public void init(FMLInitializationEvent e) {
+		ArmorMaterials.init();
+		ItemEnderArmor.init();
 		BlockTeletoryPortal.init();
 		BlockEnder.init();
 		BlockEnderOre.init();
+
 		ItemTeletoryPearl.init();
 		EntityTeletoryPearl.init(150);
 		setupTheTeletory(e);

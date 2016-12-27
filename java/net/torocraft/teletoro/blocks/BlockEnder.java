@@ -20,7 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.torocraft.teletoro.TeleToroMod;
+import net.torocraft.teletoro.TeleToro;
 
 public class BlockEnder extends Block {
 
@@ -42,7 +42,7 @@ public class BlockEnder extends Block {
 
 	public static void init() {
 		INSTANCE = new BlockEnder();
-		ResourceLocation resourceName = new ResourceLocation(TeleToroMod.MODID, NAME);
+		ResourceLocation resourceName = new ResourceLocation(TeleToro.MODID, NAME);
 		INSTANCE.setRegistryName(resourceName);
 		GameRegistry.register(INSTANCE);
 
@@ -52,7 +52,7 @@ public class BlockEnder extends Block {
 	}
 
 	public static void registerRenders() {
-		ModelResourceLocation model = new ModelResourceLocation(TeleToroMod.MODID + ":" + NAME, "inventory");
+		ModelResourceLocation model = new ModelResourceLocation(TeleToro.MODID + ":" + NAME, "inventory");
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(ITEM_INSTANCE, 0, model);
 	}
 

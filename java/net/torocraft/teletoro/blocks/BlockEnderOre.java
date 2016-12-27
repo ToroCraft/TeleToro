@@ -15,7 +15,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.torocraft.teletoro.TeleToroMod;
+import net.torocraft.teletoro.TeleToro;
 
 public class BlockEnderOre extends Block {
 
@@ -27,7 +27,7 @@ public class BlockEnderOre extends Block {
 
 	public static void init() {
 		INSTANCE = new BlockEnderOre();
-		ResourceLocation resourceName = new ResourceLocation(TeleToroMod.MODID, NAME);
+		ResourceLocation resourceName = new ResourceLocation(TeleToro.MODID, NAME);
 		INSTANCE.setRegistryName(resourceName);
 		GameRegistry.register(INSTANCE);
 
@@ -37,7 +37,7 @@ public class BlockEnderOre extends Block {
 	}
 
 	public static void registerRenders() {
-		ModelResourceLocation model = new ModelResourceLocation(TeleToroMod.MODID + ":" + NAME, "inventory");
+		ModelResourceLocation model = new ModelResourceLocation(TeleToro.MODID + ":" + NAME, "inventory");
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(ITEM_INSTANCE, 0, model);
 	}
 

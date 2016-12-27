@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
-import net.torocraft.teletoro.TeleToroMod;
+import net.torocraft.teletoro.TeleToro;
 import net.torocraft.teletoro.TeleToroUtil.TeleportorType;
 import net.torocraft.teletoro.Teletory;
 
@@ -20,8 +20,8 @@ public class EntityTeletoryPearl extends EntityEnderPearl {
 	public static String NAME = "thrownteletorypearl";
 
 	public static void init(int entityId) {
-		ResourceLocation resourceName = new ResourceLocation(TeleToroMod.MODID, NAME.toLowerCase());
-		EntityRegistry.registerModEntity(resourceName, EntityTeletoryPearl.class, NAME, entityId, TeleToroMod.instance, 60, 2, true);
+		ResourceLocation resourceName = new ResourceLocation(TeleToro.MODID, NAME.toLowerCase());
+		EntityRegistry.registerModEntity(resourceName, EntityTeletoryPearl.class, NAME, entityId, TeleToro.instance, 60, 2, true);
 	}
 
 	public EntityTeletoryPearl(World worldIn, double x, double y, double z) {

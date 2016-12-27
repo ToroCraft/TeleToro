@@ -16,7 +16,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.torocraft.teletoro.TeleToroMod;
+import net.torocraft.teletoro.TeleToro;
 
 public class ItemTeletoryPearl extends Item {
 
@@ -26,15 +26,15 @@ public class ItemTeletoryPearl extends Item {
 
 	public static void init() {
 		INSTANCE = new ItemTeletoryPearl();
-		ResourceLocation resourceName = new ResourceLocation(TeleToroMod.MODID, NAME.toLowerCase());
+		ResourceLocation resourceName = new ResourceLocation(TeleToro.MODID, NAME.toLowerCase());
 		GameRegistry.register(INSTANCE, resourceName);
 	}
 
 	public static void registerRenders() {
-		ModelResourceLocation model = new ModelResourceLocation(TeleToroMod.MODID + ":" + NAME, "inventory");
+		ModelResourceLocation model = new ModelResourceLocation(TeleToro.MODID + ":" + NAME, "inventory");
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(INSTANCE, 0, model);
 		RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
-		renderItem.getItemModelMesher().register(INSTANCE, 0, new ModelResourceLocation(TeleToroMod.MODID + ":" + NAME, "inventory"));
+		renderItem.getItemModelMesher().register(INSTANCE, 0, new ModelResourceLocation(TeleToro.MODID + ":" + NAME, "inventory"));
 	}
 
 	public ItemTeletoryPearl() {

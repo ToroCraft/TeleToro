@@ -17,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
@@ -38,6 +39,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.torocraft.teletoro.TeleToroUtil.TeleportorType;
 import net.torocraft.teletoro.blocks.BlockEnder;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
+import net.torocraft.teletoro.item.armor.ItemEnderArmor;
 import net.torocraft.teletoro.teleporter.FallFromTeletoryTeleporter;
 import net.torocraft.teletoro.teleporter.TeletoryPearlTeleporter;
 import net.torocraft.teletoro.teleporter.TeletoryTeleporter;
@@ -105,7 +107,7 @@ public class Teletory {
 			}
 
 			if (player.dimension == Teletory.DIMID) {
-				player.addStat(TeleToroMod.TELETORY_ACHIEVEMNT);
+				player.addStat(TeleToro.TELETORY_ACHIEVEMNT);
 			}
 		}
 	}
@@ -257,18 +259,20 @@ public class Teletory {
 	}
 
 	private void damageEnderBoots(EntityLivingBase entity) {
-		// TODO Auto-generated method stub
-
+		ItemStack boots = entity.getItemStackFromSlot(EntityEquipmentSlot.FEET);
+		boots.damageItem(1, entity);
 	}
 
 	private boolean isWearingEnderBoots(EntityLivingBase entity) {
-		// TODO Auto-generated method stub
-		return false;
+		ItemStack boots = entity.getItemStackFromSlot(EntityEquipmentSlot.FEET);
+		if (boots == null || boots.func_190916_E() != 1) {
+			return false;
+		}
+		return boots.getItem() == ItemEnderArmor.bootsItem;
 	}
 
 	private boolean isStandingOnEnderBlock(EntityLivingBase entity) {
 		IBlockState block = entity.worldObj.getBlockState(entity.getPosition().down());
-		System.out.println("Standing on " + block.getBlock());
 		return BlockEnder.INSTANCE == block.getBlock();
 	}
 

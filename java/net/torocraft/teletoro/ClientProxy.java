@@ -7,6 +7,7 @@ import net.torocraft.teletoro.blocks.BlockEnder;
 import net.torocraft.teletoro.blocks.BlockEnderOre;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 import net.torocraft.teletoro.item.ItemTeletoryPearl;
+import net.torocraft.teletoro.item.armor.ItemEnderArmor;
 
 public class ClientProxy extends CommonProxy {
 
@@ -18,6 +19,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void init(FMLInitializationEvent e) {
         super.init(e);
+		ItemEnderArmor.registerRenders();
 		BlockTeletoryPortal.registerRenders();
 		BlockEnder.registerRenders();
 		BlockEnderOre.registerRenders();
