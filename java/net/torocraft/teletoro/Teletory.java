@@ -9,7 +9,9 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityEndermite;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -34,6 +36,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.torocraft.teletoro.TeleToroUtil.TeleportorType;
+import net.torocraft.teletoro.blocks.BlockEnder;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 import net.torocraft.teletoro.teleporter.FallFromTeletoryTeleporter;
 import net.torocraft.teletoro.teleporter.TeletoryPearlTeleporter;
@@ -232,7 +235,16 @@ public class Teletory {
 		}
 	}
 
-	private void hurtPlayer(Entity entity) {
+	private void hurtPlayer(EntityLivingBase entity) {
+		if (isStandingOnEnderBlock(entity)) {
+			return;
+		}
+
+		if (isWearingEnderBoots(entity)) {
+			damageEnderBoots(entity);
+			return;
+		}
+
 		entity.fallDistance = 0.0F;
 		entity.attackEntityFrom(DamageSource.fall, 4f);
 
@@ -242,6 +254,22 @@ public class Teletory {
 			entityendermite.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
 			entity.worldObj.spawnEntityInWorld(entityendermite);
 		}
+	}
+
+	private void damageEnderBoots(EntityLivingBase entity) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private boolean isWearingEnderBoots(EntityLivingBase entity) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	private boolean isStandingOnEnderBlock(EntityLivingBase entity) {
+		IBlockState block = entity.worldObj.getBlockState(entity.getPosition().down());
+		System.out.println("Standing on " + block.getBlock());
+		return BlockEnder.INSTANCE == block.getBlock();
 	}
 
 	private void spawnParticles(Entity entity) {
