@@ -187,7 +187,7 @@ public class TeletoryTeleporter extends Teleporter {
 		double d0 = -1.0D;
 
 		int i = search.xSearch;
-		int j = MathHelper.floor_double(e.posY);
+		int j = MathHelper.floor(e.posY);
 		int k = search.zSearch;
 
 		int l = i;
@@ -322,7 +322,7 @@ public class TeletoryTeleporter extends Teleporter {
 		}
 
 		if (noPortalFound(d0)) {
-			i1 = MathHelper.clamp_int(i1, 70, this.world.getActualHeight() - 10);
+			i1 = MathHelper.clamp(i1, 70, this.world.getActualHeight() - 10);
 			yPos = i1;
 
 			for (i3 = -1; i3 <= 1; ++i3) {
@@ -413,14 +413,14 @@ public class TeletoryTeleporter extends Teleporter {
 
 			if (world.provider.getDimension() == Teletory.DIMID) {
 
-				longXZPair = ChunkPos.asLong(MathHelper.floor_double(entity.posX), MathHelper.floor_double(entity.posZ));
+				longXZPair = ChunkPos.asLong(MathHelper.floor(entity.posX), MathHelper.floor(entity.posZ));
 
 				xEntity = entity.posX / TRAVEL_FACTOR;
 				yEntity = entity.posY;
 				zEntity = entity.posZ / TRAVEL_FACTOR;
 
-				xSearch = MathHelper.floor_double(xEntity);
-				zSearch = MathHelper.floor_double(zEntity);
+				xSearch = MathHelper.floor(xEntity);
+				zSearch = MathHelper.floor(zEntity);
 
 			} else {
 
@@ -428,8 +428,8 @@ public class TeletoryTeleporter extends Teleporter {
 				yEntity = entity.posY;
 				zEntity = entity.posZ * TRAVEL_FACTOR;
 
-				xSearch = MathHelper.floor_double(xEntity);
-				zSearch = MathHelper.floor_double(zEntity);
+				xSearch = MathHelper.floor(xEntity);
+				zSearch = MathHelper.floor(zEntity);
 
 				longXZPair = ChunkPos.asLong(xSearch, zSearch);
 			}

@@ -131,7 +131,7 @@ public class Teletory {
 		}
 
 		if (event.getBlockSnapshot().getPos().getY() > TeletoryWorldProvider.HEIGHT) {
-			event.getPlayer().addChatMessage(new TextComponentString("max build height"));
+			event.getPlayer().sendMessage(new TextComponentString("max build height"));
 			event.setCanceled(true);
 		}
 	}
@@ -212,7 +212,7 @@ public class Teletory {
 
 	@SubscribeEvent
 	public void handlePlayerTick(TickEvent.PlayerTickEvent event) {
-		if (event.player.worldObj.isRemote) {
+		if (event.player.world.isRemote) {
 			return;
 		}
 
@@ -231,7 +231,7 @@ public class Teletory {
 			changeEntityDimension(event.player, TeleportorType.FALL);
 		}
 
-		if (isRunTick(event.player.worldObj)) {
+		if (isRunTick(event.player.world)) {
 			hurtPlayer(event.player);
 			spawnParticles(event.player);
 		}
@@ -248,13 +248,13 @@ public class Teletory {
 		}
 
 		entity.fallDistance = 0.0F;
-		entity.attackEntityFrom(DamageSource.fall, 4f);
+		entity.attackEntityFrom(DamageSource.FALL, 4f);
 
-		if (entity.worldObj.rand.nextFloat() < 0.005F && entity.worldObj.getGameRules().getBoolean("doMobSpawning")) {
-			EntityEndermite entityendermite = new EntityEndermite(entity.worldObj);
+		if (entity.world.rand.nextFloat() < 0.005F && entity.world.getGameRules().getBoolean("doMobSpawning")) {
+			EntityEndermite entityendermite = new EntityEndermite(entity.world);
 			entityendermite.setSpawnedByPlayer(true);
 			entityendermite.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
-			entity.worldObj.spawnEntityInWorld(entityendermite);
+			entity.world.spawnEntity(entityendermite);
 		}
 	}
 
@@ -265,20 +265,20 @@ public class Teletory {
 
 	private boolean isWearingEnderBoots(EntityLivingBase entity) {
 		ItemStack boots = entity.getItemStackFromSlot(EntityEquipmentSlot.FEET);
-		if (boots == null || boots.func_190916_E() != 1) {
+		if (boots == null || boots.getCount() != 1) {
 			return false;
 		}
 		return boots.getItem() == ItemEnderArmor.bootsItem;
 	}
 
 	private boolean isStandingOnEnderBlock(EntityLivingBase entity) {
-		IBlockState block = entity.worldObj.getBlockState(entity.getPosition().down());
+		IBlockState block = entity.world.getBlockState(entity.getPosition().down());
 		return BlockEnder.INSTANCE == block.getBlock();
 	}
 
 	private void spawnParticles(Entity entity) {
 		for (int i = 0; i < 32; ++i) {
-			entity.worldObj.spawnParticle(EnumParticleTypes.PORTAL, entity.posX, entity.posY + entity.worldObj.rand.nextDouble() * 2.0D, entity.posZ, entity.worldObj.rand.nextGaussian(), 0.0D, entity.worldObj.rand.nextGaussian(),
+			entity.world.spawnParticle(EnumParticleTypes.PORTAL, entity.posX, entity.posY + entity.world.rand.nextDouble() * 2.0D, entity.posZ, entity.world.rand.nextGaussian(), 0.0D, entity.world.rand.nextGaussian(),
 					new int[0]);
 		}
 	}
@@ -339,7 +339,7 @@ public class Teletory {
 			return;
 		}
 
-		if (ev.getSource() != DamageSource.outOfWorld) {
+		if (ev.getSource() != DamageSource.OUT_OF_WORLD) {
 			return;
 		}
 

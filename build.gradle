@@ -9,14 +9,14 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.11-20"
+version = "1.11.2-20"
 group= "net.torocraft.teletoro"
 archivesBaseName = "teletoro"
 
 minecraft {
-    version = "1.11-13.19.0.2180"
-    runDir = "run"
-    mappings = "snapshot_20161111"
+   version = "1.11.2-13.20.0.2201"
+   runDir = "run"
+   mappings = "snapshot_20161220"
 }
 
 dependencies {

@@ -47,7 +47,7 @@ public class ItemTeletoryPearl extends Item {
 		ItemStack itemstack = worldIn.getHeldItem(playerIn);
 
 		if (!worldIn.capabilities.isCreativeMode) {
-			itemstack.func_190918_g(1);
+			itemstack.shrink(1);
 		}
 
 		itemStackIn.playSound((EntityPlayer) null, worldIn.posX, worldIn.posY, worldIn.posZ, SoundEvents.ENTITY_ENDERPEARL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
@@ -56,10 +56,11 @@ public class ItemTeletoryPearl extends Item {
 		if (!itemStackIn.isRemote) {
 			EntityTeletoryPearl entityenderpearl = new EntityTeletoryPearl(itemStackIn, worldIn);
 			entityenderpearl.setHeadingFromThrower(worldIn, worldIn.rotationPitch, worldIn.rotationYaw, 0.0F, 1.5F, 1.0F);
-			itemStackIn.spawnEntityInWorld(entityenderpearl);
+			itemStackIn.spawnEntity(entityenderpearl);
 		}
 
 		worldIn.addStat(StatList.getObjectUseStats(this));
 		return new ActionResult(EnumActionResult.SUCCESS, itemstack);
 	}
+
 }

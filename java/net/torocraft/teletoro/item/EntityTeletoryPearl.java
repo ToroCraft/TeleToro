@@ -47,14 +47,14 @@ public class EntityTeletoryPearl extends EntityEnderPearl {
 		}
 
 		for (int i = 0; i < 32; ++i) {
-			this.worldObj.spawnParticle(EnumParticleTypes.PORTAL, this.posX, this.posY + this.rand.nextDouble() * 2.0D, this.posZ, this.rand.nextGaussian(), 0.0D, this.rand.nextGaussian(), new int[0]);
+			this.world.spawnParticle(EnumParticleTypes.PORTAL, this.posX, this.posY + this.rand.nextDouble() * 2.0D, this.posZ, this.rand.nextGaussian(), 0.0D, this.rand.nextGaussian(), new int[0]);
 		}
 
-		if (!this.worldObj.isRemote) {
+		if (!this.world.isRemote) {
 			if (thrower instanceof EntityPlayerMP) {
 				EntityPlayerMP entityplayermp = (EntityPlayerMP) thrower;
 
-				if (entityplayermp.connection.getNetworkManager().isChannelOpen() && entityplayermp.worldObj == this.worldObj && !entityplayermp.isPlayerSleeping()) {
+				if (entityplayermp.connection.getNetworkManager().isChannelOpen() && entityplayermp.world == this.world && !entityplayermp.isPlayerSleeping()) {
 					net.minecraftforge.event.entity.living.EnderTeleportEvent event = new net.minecraftforge.event.entity.living.EnderTeleportEvent(entityplayermp, this.posX, this.posY, this.posZ, 5.0F);
 					if (!net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event)) {
 
@@ -67,7 +67,7 @@ public class EntityTeletoryPearl extends EntityEnderPearl {
 							thrower.fallDistance = 0.0F;
 						} else {
 							teleport(thrower);
-							thrower.attackEntityFrom(DamageSource.fall, event.getAttackDamage());
+							thrower.attackEntityFrom(DamageSource.FALL, event.getAttackDamage());
 						}
 
 					}
@@ -83,7 +83,7 @@ public class EntityTeletoryPearl extends EntityEnderPearl {
 
 	protected void onImpactOLD(RayTraceResult result) {
 
-		if (worldObj.isRemote) {
+		if (world.isRemote) {
 			return;
 		}
 
@@ -123,7 +123,7 @@ public class EntityTeletoryPearl extends EntityEnderPearl {
 
 	protected void particles() {
 		for (int i = 0; i < 32; ++i) {
-			this.worldObj.spawnParticle(EnumParticleTypes.PORTAL, this.posX, this.posY + this.rand.nextDouble() * 2.0D, this.posZ, this.rand.nextGaussian(), 0.0D, this.rand.nextGaussian(), new int[0]);
+			this.world.spawnParticle(EnumParticleTypes.PORTAL, this.posX, this.posY + this.rand.nextDouble() * 2.0D, this.posZ, this.rand.nextGaussian(), 0.0D, this.rand.nextGaussian(), new int[0]);
 		}
 	}
 }

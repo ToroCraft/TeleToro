@@ -35,9 +35,9 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 
 	protected boolean fallIntoTeletory(Entity entity, float rotationYaw, PortalSearchState search) {
 
-		double x = MathHelper.floor_double(search.xEntity);
+		double x = MathHelper.floor(search.xEntity);
 		double y = 25;
-		double z = MathHelper.floor_double(search.zEntity);
+		double z = MathHelper.floor(search.zEntity);
 
 		entity.fallDistance = 0;
 		entity.velocityChanged = true;
@@ -69,8 +69,8 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 	}
 
 	protected BlockPos findTopOfWorld(PortalSearchState search) {
-		int xSearch = MathHelper.floor_double(search.xEntity);
-		int zSearch = MathHelper.floor_double(search.zEntity);
+		int xSearch = MathHelper.floor(search.xEntity);
+		int zSearch = MathHelper.floor(search.zEntity);
 
 		BlockPos searchPos = new BlockPos(xSearch, world.getActualHeight() - 1, zSearch);
 		while (searchPos.getY() >= 0) {

@@ -15,7 +15,6 @@ public class TeletoryWorldProvider extends WorldProvider {
 
 	public TeletoryWorldProvider() {
 		this.biomeProvider = new BiomeProviderSingle(Biomes.VOID);
-		this.isHellWorld = false;
 		this.hasNoSky = true;
 	}
 
@@ -53,7 +52,7 @@ public class TeletoryWorldProvider extends WorldProvider {
 
 	@Override
 	public IChunkGenerator createChunkGenerator() {
-		return new TeletoryChunkProvider(this.worldObj, this.worldObj.getSeed());
+		return new TeletoryChunkProvider(world, world.getSeed());
 	}
 
 	@Override
@@ -83,7 +82,12 @@ public class TeletoryWorldProvider extends WorldProvider {
 	}
 
 	@Override
-	public boolean getHasNoSky() {
+	public boolean hasSkyLight() {
+		return false;
+	}
+
+	@Override
+	public boolean hasNoSky() {
 		return true;
 	}
 
