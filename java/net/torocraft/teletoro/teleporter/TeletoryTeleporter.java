@@ -385,7 +385,7 @@ public class TeletoryTeleporter extends Teleporter {
 					x = xIn + (k3 - 1) * l5;
 					y = yIn + l3;
 					z = zIn + (k3 - 1) * l2;
-					this.world.notifyNeighborsOfStateChange(new BlockPos(x, y, z), this.world.getBlockState(new BlockPos(x, y, z)).getBlock(), false);
+					this.world.notifyNeighborsOfStateChange(new BlockPos(x, y, z), this.world.getBlockState(new BlockPos(x, y, z)).getBlock());
 				}
 			}
 		}

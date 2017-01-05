@@ -248,7 +248,7 @@ public class Teletory {
 		}
 
 		entity.fallDistance = 0.0F;
-		entity.attackEntityFrom(DamageSource.FALL, 4f);
+		entity.attackEntityFrom(DamageSource.fall, 4f);
 
 		if (entity.world.rand.nextFloat() < 0.005F && entity.world.getGameRules().getBoolean("doMobSpawning")) {
 			EntityEndermite entityendermite = new EntityEndermite(entity.world);
@@ -265,7 +265,7 @@ public class Teletory {
 
 	private boolean isWearingEnderBoots(EntityLivingBase entity) {
 		ItemStack boots = entity.getItemStackFromSlot(EntityEquipmentSlot.FEET);
-		if (boots == null || boots.getCount() != 1) {
+		if (boots == null || boots.stackSize != 1) {
 			return false;
 		}
 		return boots.getItem() == ItemEnderArmor.bootsItem;
@@ -339,7 +339,7 @@ public class Teletory {
 			return;
 		}
 
-		if (ev.getSource() != DamageSource.OUT_OF_WORLD) {
+		if (ev.getSource() != DamageSource.outOfWorld) {
 			return;
 		}
 

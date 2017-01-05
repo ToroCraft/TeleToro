@@ -1,7 +1,7 @@
-tile.enderblock.name=Ender Block
-tile.enderore.name=Ender Ore
+tile.enderBlock.name=Ender Block
+tile.enderOre.name=Ender Ore
 item.ender_boots.name=Ender Boots
 item.ender_boots.tooltip=Teletory Protection
-item.teletorypearl.name=Teletory Pearl
+item.teletoryPearl.name=Teletory Pearl
 achievement.teletory_achievement=We Need to Go Faster
 achievement.teletory_achievement.desc=Build a portal to the Teletory

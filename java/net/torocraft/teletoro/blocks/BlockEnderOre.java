@@ -23,7 +23,7 @@ public class BlockEnderOre extends Block {
 
 	public static Item ITEM_INSTANCE;
 
-	public static final String NAME = "enderore";
+	public static final String NAME = "enderOre";
 
 	public static void init() {
 		INSTANCE = new BlockEnderOre();

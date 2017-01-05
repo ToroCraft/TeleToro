@@ -12,7 +12,6 @@ import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -22,12 +21,11 @@ public class ItemTeletoryPearl extends Item {
 
 	public static ItemTeletoryPearl INSTANCE;
 
-	public static final String NAME = "teletorypearl";
+	public static final String NAME = "teletoryPearl";
 
 	public static void init() {
 		INSTANCE = new ItemTeletoryPearl();
-		ResourceLocation resourceName = new ResourceLocation(TeleToro.MODID, NAME.toLowerCase());
-		GameRegistry.register(INSTANCE, resourceName);
+		GameRegistry.registerItem(INSTANCE, NAME);
 	}
 
 	public static void registerRenders() {
@@ -43,24 +41,21 @@ public class ItemTeletoryPearl extends Item {
 		this.setCreativeTab(CreativeTabs.MISC);
 	}
 
-	public ActionResult<ItemStack> onItemRightClick(World itemStackIn, EntityPlayer worldIn, EnumHand playerIn) {
-		ItemStack itemstack = worldIn.getHeldItem(playerIn);
-
-		if (!worldIn.capabilities.isCreativeMode) {
-			itemstack.shrink(1);
+	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		if (!playerIn.capabilities.isCreativeMode) {
+			--itemStackIn.stackSize;
 		}
 
-		itemStackIn.playSound((EntityPlayer) null, worldIn.posX, worldIn.posY, worldIn.posZ, SoundEvents.ENTITY_ENDERPEARL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
-		worldIn.getCooldownTracker().setCooldown(this, 20);
+		worldIn.playSound((EntityPlayer) null, playerIn.posX, playerIn.posY, playerIn.posZ, SoundEvents.ENTITY_ENDERPEARL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
+		playerIn.getCooldownTracker().setCooldown(this, 20);
 
-		if (!itemStackIn.isRemote) {
-			EntityTeletoryPearl entityenderpearl = new EntityTeletoryPearl(itemStackIn, worldIn);
-			entityenderpearl.setHeadingFromThrower(worldIn, worldIn.rotationPitch, worldIn.rotationYaw, 0.0F, 1.5F, 1.0F);
-			itemStackIn.spawnEntity(entityenderpearl);
+		if (!worldIn.isRemote) {
+			EntityTeletoryPearl entityenderpearl = new EntityTeletoryPearl(worldIn, playerIn);
+			entityenderpearl.setHeadingFromThrower(playerIn, playerIn.rotationPitch, playerIn.rotationYaw, 0.0F, 1.5F, 1.0F);
+			worldIn.spawnEntity(entityenderpearl);
 		}
 
-		worldIn.addStat(StatList.getObjectUseStats(this));
-		return new ActionResult(EnumActionResult.SUCCESS, itemstack);
+		playerIn.addStat(StatList.getObjectUseStats(this));
+		return new ActionResult(EnumActionResult.SUCCESS, itemStackIn);
 	}
-
 }

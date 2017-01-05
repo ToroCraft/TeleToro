@@ -38,7 +38,7 @@ public class BlockEnder extends Block {
 
 	public static Item ITEM_INSTANCE;
 
-	public static final String NAME = "enderblock";
+	public static final String NAME = "enderBlock";
 
 	public static void init() {
 		INSTANCE = new BlockEnder();

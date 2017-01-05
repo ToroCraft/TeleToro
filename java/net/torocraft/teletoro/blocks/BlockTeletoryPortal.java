@@ -21,7 +21,7 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 
 	public static Item ITEM_INSTANCE;
 
-	public static final String NAME = "teletoryportalblock";
+	public static final String NAME = "teletoryPortalBlock";
 
 	public static void init() {
 		INSTANCE = (BlockTeletoryPortal) new BlockTeletoryPortal().setUnlocalizedName(NAME);

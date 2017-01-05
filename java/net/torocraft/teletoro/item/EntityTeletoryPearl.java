@@ -6,7 +6,6 @@ import net.minecraft.entity.item.EntityEnderPearl;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
@@ -17,11 +16,10 @@ import net.torocraft.teletoro.Teletory;
 
 public class EntityTeletoryPearl extends EntityEnderPearl {
 
-	public static String NAME = "thrownteletorypearl";
+	public static String NAME = "ThrownTeletorypearl";
 
 	public static void init(int entityId) {
-		ResourceLocation resourceName = new ResourceLocation(TeleToro.MODID, NAME.toLowerCase());
-		EntityRegistry.registerModEntity(resourceName, EntityTeletoryPearl.class, NAME, entityId, TeleToro.instance, 60, 2, true);
+		EntityRegistry.registerModEntity(EntityTeletoryPearl.class, NAME, entityId, TeleToro.instance, 60, 2, true);
 	}
 
 	public EntityTeletoryPearl(World worldIn, double x, double y, double z) {
@@ -67,7 +65,7 @@ public class EntityTeletoryPearl extends EntityEnderPearl {
 							thrower.fallDistance = 0.0F;
 						} else {
 							teleport(thrower);
-							thrower.attackEntityFrom(DamageSource.FALL, event.getAttackDamage());
+							thrower.attackEntityFrom(DamageSource.fall, event.getAttackDamage());
 						}
 
 					}

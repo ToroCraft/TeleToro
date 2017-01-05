@@ -14,9 +14,9 @@ group= "net.torocraft.teletoro"
 archivesBaseName = "teletoro"
 
 minecraft {
-   version = "1.11.2-13.20.0.2201"
+   version = "1.10.2-12.18.2.2099"
    runDir = "run"
-   mappings = "snapshot_20161220"
+   mappings = 'stable_29'
 }
 
 dependencies {

@@ -48,8 +48,5 @@ public class EmptyChunkProvider implements IChunkGenerator {
 
 	}
 
-	@Override
-	public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position, boolean p_180513_4_) {
-		return null;
-	}
+
 }

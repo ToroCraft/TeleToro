@@ -82,11 +82,6 @@ public class TeletoryWorldProvider extends WorldProvider {
 	}
 
 	@Override
-	public boolean hasSkyLight() {
-		return false;
-	}
-
-	@Override
 	public boolean hasNoSky() {
 		return true;
 	}
