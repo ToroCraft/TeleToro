@@ -12,6 +12,7 @@ import net.torocraft.teletoro.blocks.BlockEnderOre;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 import net.torocraft.teletoro.item.EntityTeletoryPearl;
 import net.torocraft.teletoro.item.ItemTeletoryPearl;
+import net.torocraft.teletoro.item.ItemTeletoryPortalLinker;
 import net.torocraft.teletoro.item.armor.ItemEnderArmor;
 import net.torocraft.teletoro.material.ArmorMaterials;
 
@@ -28,6 +29,7 @@ public class CommonProxy {
 		BlockEnderOre.init();
 
 		ItemTeletoryPearl.init();
+		ItemTeletoryPortalLinker.init();
 		EntityTeletoryPearl.init(150);
 		setupTheTeletory(e);
 		GameRegistry.addRecipe(new ItemStack(BlockEnder.INSTANCE), "##", "##", '#', Items.ENDER_PEARL);

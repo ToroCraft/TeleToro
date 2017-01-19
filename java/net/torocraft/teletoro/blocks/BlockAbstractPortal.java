@@ -434,6 +434,10 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 				}
 			}
 		}
+		
+		public BlockPos getBottomLeft() {
+			return bottomLeft;
+		}
 	}
 
 }
