@@ -44,13 +44,14 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 		return new BlockTeletoryPortal.Size(worldIn, p_i45694_2_, p_i45694_3_);
 	}
 
-	protected void onPlayerEnterPortal(EntityPlayerMP player) {
+	@Override
+	protected void onPlayerEnterPortal(EntityPlayerMP player, BlockPos pos) {
 		Teletory.changeEntityDimension(player, TeleportorType.PORTAL);
 	}
 
 	public static class Size extends BlockAbstractPortal.Size {
-		
-		//TODO collapse portal, rebuild with diff block
+
+		// TODO collapse portal, rebuild with diff block
 
 		public Size(World world, BlockPos pos, Axis axis) {
 			super(world, pos, axis);

@@ -165,14 +165,14 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 			entity.timeUntilPortal = 10;
 		} else if (entity instanceof EntityPlayerMP) {
 			EntityPlayerMP player = (EntityPlayerMP) entity;
-			onPlayerEnterPortal(player);
+			onPlayerEnterPortal(player, pos);
 			player.timeUntilPortal = 10;
 		} else {
 			// TODO support non-player entities
 		}
 	}
 
-	protected abstract void onPlayerEnterPortal(EntityPlayerMP player);
+	protected abstract void onPlayerEnterPortal(EntityPlayerMP player, BlockPos pos);
 
 	@Nullable
 	public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {

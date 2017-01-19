@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
@@ -17,7 +18,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToro;
 import net.torocraft.teletoro.blocks.BlockAbstractPortal.Size;
-import net.torocraft.teletoro.blocks.BlockAbstractPortal;
 import net.torocraft.teletoro.blocks.BlockLinkedTeletoryPortal;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 
@@ -51,39 +51,57 @@ public class ItemTeletoryPortalLinker extends Item {
 			float hitZ) {
 		Block block = world.getBlockState(pos).getBlock();
 		if (block == BlockTeletoryPortal.INSTANCE) {
-			ControlBlockLocation loc = findControllerBlock(world, pos);
-			if(loc != null){
-				BlockTeletoryPortal.Size size = new BlockTeletoryPortal.Size(world, loc.pos, loc.axis);
-				size.placePortalBlocks(BlockLinkedTeletoryPortal.INSTANCE);
-			}
-
-			world.setTileEntity(loc.pos, null);
+			onItemUsedOnPortalBlock(world, pos, player.getHeldItem(hand));
 		}
+
 		return EnumActionResult.PASS;
 	}
-	
+
+	private void onItemUsedOnPortalBlock(World world, BlockPos pos, ItemStack stack) {
+		if (stack == null || stack.getItem() != INSTANCE) {
+			return;
+		}
+
+		ControlBlockLocation loc = findControllerBlock(world, pos);
+
+		if (loc == null) {
+			return;
+		}
+
+		// stack.get
+
+		// if item already has a portal location
+
+		BlockTeletoryPortal.Size size = new BlockTeletoryPortal.Size(world, loc.pos, loc.axis);
+		size.placePortalBlocks(BlockLinkedTeletoryPortal.INSTANCE);
+
+		world.setTileEntity(loc.pos, null);
+	}
+
+	// private BlockPos get TODO get linker status
+
 	public static ControlBlockLocation findControllerBlock(World world, BlockPos pos) {
 		Size size = new BlockTeletoryPortal.Size(world, pos, Axis.X);
-		
+
 		ControlBlockLocation loc = new ControlBlockLocation();
-		
+
 		if (size.isValid()) {
 			loc.pos = size.getBottomLeft();
 			loc.axis = Axis.X;
 			return loc;
 		}
-		
+
 		size = new BlockTeletoryPortal.Size(world, pos, Axis.Z);
-		
+
 		if (size.isValid()) {
 			loc.pos = size.getBottomLeft();
 			loc.axis = Axis.Z;
 			return loc;
 		}
-		
+
 		return null;
 	}
-	
+
 	public static class ControlBlockLocation {
 		public Axis axis;
 		public BlockPos pos;
