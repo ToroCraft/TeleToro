@@ -83,13 +83,6 @@ public class Teletory {
 			}
 		}
 
-		private void particles() {
-			World world = entity.getEntityWorld();
-			Random rand = world.rand;
-			for (int i = 0; i < 32; ++i) {
-				world.spawnParticle(EnumParticleTypes.PORTAL, entity.posX, entity.posY + rand.nextDouble() * 2.0D, entity.posZ, rand.nextGaussian(), 0.0D, rand.nextGaussian(), new int[0]);
-			}
-		}
 	}
 
 	private static class AchievementRunner implements Runnable {
@@ -321,8 +314,6 @@ public class Teletory {
 		if (par7 == 5) {
 			par4++;
 		}
-
-		EntityPlayer par2EntityPlayer = event.getEntityPlayer();
 
 		Block i1 = getBlock(event.getWorld(), par4, par5, par6);
 		if (i1 == Blocks.AIR) {

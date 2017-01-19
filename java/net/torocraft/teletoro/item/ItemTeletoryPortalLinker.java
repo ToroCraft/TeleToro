@@ -18,14 +18,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToro;
 
-public class ItemTeletoryPearl extends Item {
+public class ItemTeletoryPortalLinker extends Item {
 
-	public static ItemTeletoryPearl INSTANCE;
+	public static ItemTeletoryPortalLinker INSTANCE;
 
 	public static final String NAME = "teletorypearl";
 
 	public static void init() {
-		INSTANCE = new ItemTeletoryPearl();
+		INSTANCE = new ItemTeletoryPortalLinker();
 		ResourceLocation resourceName = new ResourceLocation(TeleToro.MODID, NAME.toLowerCase());
 		GameRegistry.register(INSTANCE, resourceName);
 	}
@@ -37,7 +37,7 @@ public class ItemTeletoryPearl extends Item {
 		renderItem.getItemModelMesher().register(INSTANCE, 0, new ModelResourceLocation(TeleToro.MODID + ":" + NAME, "inventory"));
 	}
 
-	public ItemTeletoryPearl() {
+	public ItemTeletoryPortalLinker() {
 		setUnlocalizedName(NAME);
 		this.maxStackSize = 16;
 		this.setCreativeTab(CreativeTabs.MISC);

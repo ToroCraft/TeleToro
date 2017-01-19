@@ -27,7 +27,7 @@ public class TeletoryTeleporter extends Teleporter {
 
 	private final WorldServer world;
 	private final Random random;
-	private final Long2ObjectMap<Teleporter.PortalPosition> destinationCoordinateCache = new Long2ObjectOpenHashMap(4096);
+	private final Long2ObjectMap<Teleporter.PortalPosition> destinationCoordinateCache = new Long2ObjectOpenHashMap<PortalPosition>(4096);
 
 	public TeletoryTeleporter(WorldServer worldIn) {
 		super(worldIn);
@@ -113,35 +113,13 @@ public class TeletoryTeleporter extends Teleporter {
 		double y = (double) (search.portalPos).getY() + 0.5D;
 		double z = (double) (search.portalPos).getZ() + 0.5D;
 		entity.motionX = entity.motionY = entity.motionZ = 0.0D;
-		// if (!world.isRemote) {
-			if (entity instanceof EntityPlayerMP) {
-				((EntityPlayerMP) entity).connection.setPlayerLocation(x, y, z, entity.rotationYaw, entity.rotationPitch);
-			}
-			
-			entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
-			entity.setPositionAndUpdate(x, y, z);
-		// }
-	}
 
-	private EnumFacing determinePortalDirection(PortalSearchState search) {
-		EnumFacing portalDirection = null;
-
-		if (world.getBlockState((search.portalPos).west()).getBlock() == BlockTeletoryPortal.INSTANCE) {
-			portalDirection = EnumFacing.NORTH;
+		if (entity instanceof EntityPlayerMP) {
+			((EntityPlayerMP) entity).connection.setPlayerLocation(x, y, z, entity.rotationYaw, entity.rotationPitch);
 		}
 
-		if (world.getBlockState((search.portalPos).east()).getBlock() == BlockTeletoryPortal.INSTANCE) {
-			portalDirection = EnumFacing.SOUTH;
-		}
-
-		if (world.getBlockState((search.portalPos).north()).getBlock() == BlockTeletoryPortal.INSTANCE) {
-			portalDirection = EnumFacing.EAST;
-		}
-
-		if (world.getBlockState((search.portalPos).south()).getBlock() == BlockTeletoryPortal.INSTANCE) {
-			portalDirection = EnumFacing.WEST;
-		}
-		return portalDirection;
+		entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
+		entity.setPositionAndUpdate(x, y, z);
 	}
 
 	private void cachePortalLocation(PortalSearchState search) {
@@ -156,10 +134,6 @@ public class TeletoryTeleporter extends Teleporter {
 
 	private boolean portalIsCached(long longIJPair) {
 		return this.destinationCoordinateCache.containsKey(Long.valueOf(longIJPair));
-	}
-
-	private boolean isBlocked(BlockPos pos) {
-		return !world.isAirBlock(pos) || !world.isAirBlock(pos.up());
 	}
 
 	@Override
@@ -180,6 +154,7 @@ public class TeletoryTeleporter extends Teleporter {
 		return true;
 	}
 
+	@SuppressWarnings("deprecation")
 	public boolean makePortalOnExistingGround(Entity e) {
 		PortalSearchState search = new PortalSearchState(e, world);
 
@@ -240,7 +215,8 @@ public class TeletoryTeleporter extends Teleporter {
 										i5 = i3 + k4;
 										int j5 = zPos + (j4 - 1) * l3 - i4 * k3;
 										Block tmp = this.world.getBlockState(new BlockPos(l4, i5, j5)).getBlock();
-										if (k4 < 0 && !tmp.getMaterial(tmp.getDefaultState()).isSolid() || k4 >= 0 && !this.world.isAirBlock(new BlockPos(l4, i5, j5))) {
+										if (k4 < 0 && !tmp.getMaterial(tmp.getDefaultState()).isSolid()
+												|| k4 >= 0 && !this.world.isAirBlock(new BlockPos(l4, i5, j5))) {
 											continue label271;
 										}
 									}
@@ -287,7 +263,8 @@ public class TeletoryTeleporter extends Teleporter {
 										l4 = i3 + j4;
 										i5 = zPos + (i4 - 1) * l3;
 										Block tmpb = this.world.getBlockState(new BlockPos(k4, l4, i5)).getBlock();
-										if (j4 < 0 && !tmpb.getMaterial(tmpb.getDefaultState()).isSolid() || j4 >= 0 && !this.world.isAirBlock(new BlockPos(k4, l4, i5))) {
+										if (j4 < 0 && !tmpb.getMaterial(tmpb.getDefaultState()).isSolid()
+												|| j4 >= 0 && !this.world.isAirBlock(new BlockPos(k4, l4, i5))) {
 											continue label219;
 										}
 									}
@@ -332,7 +309,8 @@ public class TeletoryTeleporter extends Teleporter {
 						i4 = yPos + k3;
 						j4 = zPos + (j3 - 1) * l2 - i3 * l5;
 						boolean flag = k3 < 0;
-						this.world.setBlockState(new BlockPos(l3, i4, j4), flag ? BlockEnder.INSTANCE.getDefaultState() : Blocks.AIR.getDefaultState());
+						this.world.setBlockState(new BlockPos(l3, i4, j4),
+								flag ? BlockEnder.INSTANCE.getDefaultState() : Blocks.AIR.getDefaultState());
 					}
 				}
 			}
@@ -367,7 +345,8 @@ public class TeletoryTeleporter extends Teleporter {
 		int y;
 		int z;
 
-		IBlockState iblockstate = BlockTeletoryPortal.INSTANCE.getDefaultState().withProperty(BlockPortal.AXIS, l5 == 0 ? EnumFacing.Axis.Z : EnumFacing.Axis.X);
+		IBlockState iblockstate = BlockTeletoryPortal.INSTANCE.getDefaultState().withProperty(BlockPortal.AXIS,
+				l5 == 0 ? EnumFacing.Axis.Z : EnumFacing.Axis.X);
 
 		for (j3 = 0; j3 < 4; ++j3) {
 			for (k3 = 0; k3 < 4; ++k3) {

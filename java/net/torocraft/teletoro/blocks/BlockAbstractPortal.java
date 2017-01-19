@@ -411,6 +411,7 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 			}
 		}
 
+		@SuppressWarnings("deprecation")
 		private Material getMaterial(Block blockIn) {
 			return blockIn.getMaterial(null);
 		}
