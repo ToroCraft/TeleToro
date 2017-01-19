@@ -6,20 +6,19 @@ import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToro;
-import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 import net.torocraft.teletoro.blocks.BlockAbstractPortal.Size;
+import net.torocraft.teletoro.blocks.BlockLinkedTeletoryPortal;
+import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 
 public class ItemTeletoryPortalLinker extends Item {
 
@@ -49,42 +48,42 @@ public class ItemTeletoryPortalLinker extends Item {
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY,
 			float hitZ) {
-
 		Block block = world.getBlockState(pos).getBlock();
-
 		if (block == BlockTeletoryPortal.INSTANCE) {
-			System.out.println("used on portal");
-			
-			//BlockPos controlBlock = findControllerBlock(world, new BlockPos(hitX, hitY, hitZ));
-			BlockPos controlBlock = findControllerBlock(world, pos);
-			
-			if(controlBlock != null){
-				world.setBlockState(controlBlock, Blocks.COBBLESTONE.getDefaultState());
+			ControlBlockLocation loc = findControllerBlock(world, pos);
+			if(loc != null){
+				BlockTeletoryPortal.Size size = new BlockTeletoryPortal.Size(world, loc.pos, loc.axis);
+				size.placePortalBlocks(BlockLinkedTeletoryPortal.INSTANCE);
 			}
-			
-			
-			System.out.println(controlBlock);
-			
 		}
-
 		return EnumActionResult.PASS;
 	}
 	
-	public static BlockPos findControllerBlock(World world, BlockPos pos) {
-		Size size = new BlockTeletoryPortal.Size(world, pos, EnumFacing.Axis.X);
+	public static ControlBlockLocation findControllerBlock(World world, BlockPos pos) {
+		Size size = new BlockTeletoryPortal.Size(world, pos, Axis.X);
 		
+		ControlBlockLocation loc = new ControlBlockLocation();
 		
 		if (size.isValid()) {
-			return size.getBottomLeft();
+			loc.pos = size.getBottomLeft();
+			loc.axis = Axis.X;
+			return loc;
 		}
 		
-		size = new BlockTeletoryPortal.Size(world, pos, EnumFacing.Axis.Z);
+		size = new BlockTeletoryPortal.Size(world, pos, Axis.Z);
 		
 		if (size.isValid()) {
-			return size.getBottomLeft();
+			loc.pos = size.getBottomLeft();
+			loc.axis = Axis.Z;
+			return loc;
 		}
 		
 		return null;
+	}
+	
+	public static class ControlBlockLocation {
+		public Axis axis;
+		public BlockPos pos;
 	}
 
 }

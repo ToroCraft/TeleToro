@@ -49,9 +49,11 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 	}
 
 	public static class Size extends BlockAbstractPortal.Size {
+		
+		//TODO collapse portal, rebuild with diff block
 
-		public Size(World worldIn, BlockPos p_i45694_2_, Axis p_i45694_3_) {
-			super(worldIn, p_i45694_2_, p_i45694_3_);
+		public Size(World world, BlockPos pos, Axis axis) {
+			super(world, pos, axis);
 		}
 
 		@Override
@@ -59,6 +61,11 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 			return BlockEnder.INSTANCE;
 		}
 
+	}
+
+	@Override
+	public BlockAbstractPortal getPortalBlock() {
+		return INSTANCE;
 	}
 
 }

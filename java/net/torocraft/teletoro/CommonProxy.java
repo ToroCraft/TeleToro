@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.blocks.BlockEnder;
 import net.torocraft.teletoro.blocks.BlockEnderOre;
+import net.torocraft.teletoro.blocks.BlockLinkedTeletoryPortal;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 import net.torocraft.teletoro.item.EntityTeletoryPearl;
 import net.torocraft.teletoro.item.ItemTeletoryPearl;
@@ -25,6 +26,7 @@ public class CommonProxy {
 		ArmorMaterials.init();
 		ItemEnderArmor.init();
 		BlockTeletoryPortal.init();
+		BlockLinkedTeletoryPortal.init();
 		BlockEnder.init();
 		BlockEnderOre.init();
 

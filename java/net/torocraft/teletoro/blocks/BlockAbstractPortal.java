@@ -18,13 +18,12 @@ import net.minecraft.block.state.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.Rotation;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -33,7 +32,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class BlockAbstractPortal extends BlockBreakable {
-	public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis>create("axis", EnumFacing.Axis.class, new EnumFacing.Axis[] { EnumFacing.Axis.X, EnumFacing.Axis.Z });
+	public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis> create("axis", EnumFacing.Axis.class,
+			new EnumFacing.Axis[] { EnumFacing.Axis.X, EnumFacing.Axis.Z });
 	protected static final AxisAlignedBB X_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.375D, 1.0D, 1.0D, 0.625D);
 	protected static final AxisAlignedBB Z_AABB = new AxisAlignedBB(0.375D, 0.0D, 0.0D, 0.625D, 1.0D, 1.0D);
 	protected static final AxisAlignedBB Y_AABB = new AxisAlignedBB(0.375D, 0.0D, 0.375D, 0.625D, 1.0D, 0.625D);
@@ -73,17 +73,19 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 		return false;
 	}
 
+	public abstract BlockAbstractPortal getPortalBlock();
+
 	public boolean trySpawnPortal(World worldIn, BlockPos pos) {
 		Size size = getSizer(worldIn, pos, EnumFacing.Axis.X);
 
 		if (size.isValid() && size.portalBlockCount == 0) {
-			size.placePortalBlocks();
+			size.placePortalBlocks(getPortalBlock());
 			return true;
 		} else {
 			Size size1 = getSizer(worldIn, pos, EnumFacing.Axis.Z);
 
 			if (size1.isValid() && size1.portalBlockCount == 0) {
-				size1.placePortalBlocks();
+				size1.placePortalBlocks(getPortalBlock());
 				return true;
 			} else {
 				return false;
@@ -91,21 +93,25 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 		}
 	}
 
-	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn) {
+	@Override
+	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+		breakPortalBlocks(state, worldIn, pos);
+	}
+
+	public void breakPortalBlocks(IBlockState state, World world, BlockPos pos) {
 		EnumFacing.Axis axis = (EnumFacing.Axis) state.getValue(AXIS);
 
 		if (axis == EnumFacing.Axis.X) {
-			BlockAbstractPortal.Size sizer = getSizer(worldIn, pos, EnumFacing.Axis.X);
+			BlockAbstractPortal.Size sizer = getSizer(world, pos, EnumFacing.Axis.X);
 			if (!sizer.isValid() || sizer.portalBlockCount < sizer.width * sizer.height) {
-				worldIn.setBlockState(pos, Blocks.AIR.getDefaultState());
+				world.setBlockState(pos, Blocks.AIR.getDefaultState());
 			}
 		} else if (axis == EnumFacing.Axis.Z) {
-			BlockAbstractPortal.Size sizer = getSizer(worldIn, pos, EnumFacing.Axis.Z);
+			BlockAbstractPortal.Size sizer = getSizer(world, pos, EnumFacing.Axis.Z);
 			if (!sizer.isValid() || sizer.portalBlockCount < sizer.width * sizer.height) {
-				worldIn.setBlockState(pos, Blocks.AIR.getDefaultState());
+				world.setBlockState(pos, Blocks.AIR.getDefaultState());
 			}
 		}
-
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -135,7 +141,8 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 		boolean flag3 = blockAccess.getBlockState(pos.south()).getBlock() == this && blockAccess.getBlockState(pos.south(2)).getBlock() != this;
 		boolean flag4 = flag || flag1 || enumfacing$axis == EnumFacing.Axis.X;
 		boolean flag5 = flag2 || flag3 || enumfacing$axis == EnumFacing.Axis.Z;
-		return flag4 && side == EnumFacing.WEST ? true : (flag4 && side == EnumFacing.EAST ? true : (flag5 && side == EnumFacing.NORTH ? true : flag5 && side == EnumFacing.SOUTH));
+		return flag4 && side == EnumFacing.WEST ? true
+				: (flag4 && side == EnumFacing.EAST ? true : (flag5 && side == EnumFacing.NORTH ? true : flag5 && side == EnumFacing.SOUTH));
 	}
 
 	/**
@@ -186,10 +193,6 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 
 	@SideOnly(Side.CLIENT)
 	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
-		if (rand.nextInt(100) == 0) {
-			worldIn.playSound((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D, SoundEvents.BLOCK_PORTAL_AMBIENT, SoundCategory.BLOCKS, 0.5F, rand.nextFloat() * 0.4F + 0.8F, false);
-		}
-
 		for (int i = 0; i < 4; ++i) {
 			double d0 = (double) ((float) pos.getX() + rand.nextFloat());
 			double d1 = (double) ((float) pos.getY() + rand.nextFloat());
@@ -264,8 +267,10 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 
 			for (EnumFacing.AxisDirection enumfacing$axisdirection : EnumFacing.AxisDirection.values()) {
 				BlockPattern.PatternHelper blockpattern$patternhelper = new BlockPattern.PatternHelper(
-						enumfacing.getAxisDirection() == enumfacing$axisdirection ? blockpos : blockpos.offset(blockportal$size.rightDir, blockportal$size.getWidth() - 1),
-						EnumFacing.getFacingFromAxis(enumfacing$axisdirection, enumfacing$axis), EnumFacing.UP, loadingcache, blockportal$size.getWidth(), blockportal$size.getHeight(), 1);
+						enumfacing.getAxisDirection() == enumfacing$axisdirection ? blockpos
+								: blockpos.offset(blockportal$size.rightDir, blockportal$size.getWidth() - 1),
+						EnumFacing.getFacingFromAxis(enumfacing$axisdirection, enumfacing$axis), EnumFacing.UP, loadingcache,
+						blockportal$size.getWidth(), blockportal$size.getHeight(), 1);
 
 				for (int i = 0; i < blockportal$size.getWidth(); ++i) {
 					for (int j = 0; j < blockportal$size.getHeight(); ++j) {
@@ -286,8 +291,11 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 				}
 			}
 
-			return new BlockPattern.PatternHelper(enumfacing.getAxisDirection() == enumfacing$axisdirection1 ? blockpos : blockpos.offset(blockportal$size.rightDir, blockportal$size.getWidth() - 1),
-					EnumFacing.getFacingFromAxis(enumfacing$axisdirection1, enumfacing$axis), EnumFacing.UP, loadingcache, blockportal$size.getWidth(), blockportal$size.getHeight(), 1);
+			return new BlockPattern.PatternHelper(
+					enumfacing.getAxisDirection() == enumfacing$axisdirection1 ? blockpos
+							: blockpos.offset(blockportal$size.rightDir, blockportal$size.getWidth() - 1),
+					EnumFacing.getFacingFromAxis(enumfacing$axisdirection1, enumfacing$axis), EnumFacing.UP, loadingcache,
+					blockportal$size.getWidth(), blockportal$size.getHeight(), 1);
 		}
 	}
 
@@ -305,36 +313,37 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 
 		public abstract Block getFrameBlock();
 
-		public Size(World worldIn, BlockPos pos, EnumFacing.Axis axis) {
+		public Size(World worldIn, BlockPos pos, Axis axis) {
 			this.world = worldIn;
 			this.axis = axis;
 
 			if (axis == EnumFacing.Axis.X) {
-				this.leftDir = EnumFacing.EAST;
-				this.rightDir = EnumFacing.WEST;
+				leftDir = EnumFacing.EAST;
+				rightDir = EnumFacing.WEST;
 			} else {
-				this.leftDir = EnumFacing.NORTH;
-				this.rightDir = EnumFacing.SOUTH;
+				leftDir = EnumFacing.NORTH;
+				rightDir = EnumFacing.SOUTH;
 			}
 
-			for (BlockPos blockpos = pos; pos.getY() > blockpos.getY() - 21 && pos.getY() > 0 && this.isEmptyBlock(worldIn.getBlockState(pos.down()).getBlock()); pos = pos.down()) {
+			for (BlockPos blockpos = pos; pos.getY() > blockpos.getY() - 21 && pos.getY() > 0
+					&& isEmptyBlock(worldIn.getBlockState(pos.down()).getBlock()); pos = pos.down()) {
 				;
 			}
 
 			int i = this.getDistanceUntilEdge(pos, this.leftDir) - 1;
 
 			if (i >= 0) {
-				this.bottomLeft = pos.offset(this.leftDir, i);
-				this.width = this.getDistanceUntilEdge(this.bottomLeft, this.rightDir);
+				bottomLeft = pos.offset(leftDir, i);
+				width = this.getDistanceUntilEdge(bottomLeft, rightDir);
 
-				if (this.width < 2 || this.width > 21) {
-					this.bottomLeft = null;
-					this.width = 0;
+				if (width < 2 || width > 21) {
+					bottomLeft = null;
+					width = 0;
 				}
 			}
 
-			if (this.bottomLeft != null) {
-				this.height = this.calculatePortalHeight();
+			if (bottomLeft != null) {
+				height = calculatePortalHeight();
 			}
 
 		}
@@ -345,7 +354,8 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 			for (i = 0; i < 22; ++i) {
 				BlockPos blockpos = p_180120_1_.offset(p_180120_2_, i);
 
-				if (!this.isEmptyBlock(this.world.getBlockState(blockpos).getBlock()) || this.world.getBlockState(blockpos.down()).getBlock() != getFrameBlock()) {
+				if (!this.isEmptyBlock(this.world.getBlockState(blockpos).getBlock())
+						|| this.world.getBlockState(blockpos.down()).getBlock() != getFrameBlock()) {
 					break;
 				}
 			}
@@ -425,16 +435,16 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 			return valid;
 		}
 
-		public void placePortalBlocks() {
+		public void placePortalBlocks(BlockAbstractPortal portalBlock) {
 			for (int i = 0; i < this.width; ++i) {
 				BlockPos blockpos = this.bottomLeft.offset(this.rightDir, i);
 
 				for (int j = 0; j < this.height; ++j) {
-					this.world.setBlockState(blockpos.up(j), BlockTeletoryPortal.INSTANCE.getDefaultState().withProperty(BlockAbstractPortal.AXIS, this.axis), 2);
+					this.world.setBlockState(blockpos.up(j), portalBlock.getDefaultState().withProperty(BlockAbstractPortal.AXIS, this.axis), 2);
 				}
 			}
 		}
-		
+
 		public BlockPos getBottomLeft() {
 			return bottomLeft;
 		}
