@@ -55,7 +55,6 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

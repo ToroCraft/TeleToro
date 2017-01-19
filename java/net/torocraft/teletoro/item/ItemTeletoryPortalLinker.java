@@ -17,6 +17,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToro;
 import net.torocraft.teletoro.blocks.BlockAbstractPortal.Size;
+import net.torocraft.teletoro.blocks.BlockAbstractPortal;
 import net.torocraft.teletoro.blocks.BlockLinkedTeletoryPortal;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 
@@ -55,6 +56,8 @@ public class ItemTeletoryPortalLinker extends Item {
 				BlockTeletoryPortal.Size size = new BlockTeletoryPortal.Size(world, loc.pos, loc.axis);
 				size.placePortalBlocks(BlockLinkedTeletoryPortal.INSTANCE);
 			}
+
+			world.setTileEntity(loc.pos, null);
 		}
 		return EnumActionResult.PASS;
 	}
