@@ -16,14 +16,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToro;
+import net.torocraft.teletoro.TeleToroUtil;
 import net.torocraft.teletoro.item.ItemTeletoryPortalLinker;
 import net.torocraft.teletoro.item.ItemTeletoryPortalLinker.ControlBlockLocation;
 
-//TODO create linked portals, break one, the other still works
-
-//TODO figure out player placement (point player towards the side that was clicked on when linking)
-
-//TODO when a linked portal collapses, break the remote too
+//TODO when remote portal is out of range of client, the portal blocks do not update correct
 
 public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements ITileEntityProvider {
 
@@ -67,9 +64,6 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 		ControlBlockLocation thisPortal = ItemTeletoryPortalLinker.findControllerBlock(player.world, thisPortalLocation, ItemTeletoryPortalLinker.LINKED_SIZER);
 
 		if (thisPortal == null) {
-			//TODO break; 
-			
-			System.out.println("this portal is null");
 			return;
 		}
 
@@ -77,39 +71,33 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 
 		if (te == null) {
 			breakPortal(player, thisPortalLocation);
-			System.out.println("te is null");
 			return;
 		}
 
 		if (te.getDimId() != player.dimension) {
 			// TODO support change dimension to specific place
 			// Teletory.changeEntityDimension(player, TeleportorType.PORTAL);
-		
 			breakPortal(player, thisPortalLocation);
-			System.out.println("Handle inter dimensional links ... not currenlty supported");
 			return;
 		}
 		
 		if(te.getDestination() == null){
-			
 			breakPortal(player, thisPortalLocation);
-			System.out.println("detination not set");
 			return;
 		}
-
-		// find remote control block and verify portal
 
 		ControlBlockLocation remotePortal = ItemTeletoryPortalLinker.findControllerBlock(player.world, te.getDestination(), ItemTeletoryPortalLinker.LINKED_SIZER);
 
 		if (remotePortal == null) {
-			System.out.println("linked remote portal not found");
+			breakPortal(player, thisPortalLocation);
+			return;
+		}
+		
+		if (player.world.getBlockState(remotePortal.pos).getBlock() != BlockLinkedTeletoryPortal.INSTANCE) {
 			breakPortal(player, thisPortalLocation);
 			return;
 		}
 
-		System.out.println("teleporting to " + remotePortal.pos);
-
-		// TODO correct yaw based on facing of remote portal
 		float yaw;
 		if(Axis.X.equals( remotePortal.axis)){
 			if(te.getSide() == 1){
@@ -125,6 +113,7 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 			}
 		}
 		
+		TeleToroUtil.setInvulnerableDimensionChange(player);
 		
 		player.connection.setPlayerLocation(remotePortal.pos.getX() + 0.5, remotePortal.pos.getY(), remotePortal.pos.getZ() + 0.5, yaw,
 				player.rotationPitch);
@@ -156,32 +145,8 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 
 	@Override
 	public void breakBlock(World world, BlockPos pos, IBlockState state) {
-		collapseRemotePortal(world, world.getTileEntity(pos));
 		super.breakBlock(world, pos, state);
 		world.removeTileEntity(pos);
-	}
-
-	private void collapseRemotePortal(World world, TileEntity te) {
-		
-		System.out.println("attempt to collapse remote");
-		
-		if(te == null || !(te instanceof TileEntityLinkedTeletoryPortal)){
-			System.out.println("remote te not found");
-			return;
-		}
-		BlockPos remotePos = ((TileEntityLinkedTeletoryPortal)te).getDestination();
-		if(remotePos == null){
-			System.out.println("remote control block not found");
-			return;
-		}
-		
-		if(world.getBlockState(remotePos) == BlockLinkedTeletoryPortal.INSTANCE){
-			System.out.println("collapse it");
-			world.setBlockState(remotePos, Blocks.AIR.getDefaultState());
-		}else{
-			System.out.println("remote location is not a portal");
-		}
-		
 	}
 
 	/**

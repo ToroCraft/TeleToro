@@ -8,7 +8,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.util.EnumActionResult;
@@ -65,14 +64,12 @@ public class ItemTeletoryPortalLinker extends Item {
 	private void onItemUsedOnPortalBlock(EntityPlayer player, World world, BlockPos pos, ItemStack stack) {
 
 		if (stack == null || stack.getItem() != INSTANCE) {
-			System.out.println("incorrect item used");
 			return;
 		}
 
 		ControlBlockLocation thisPortal = findControllerBlock(world, pos, STANDARD_SIZER);
 
 		if (thisPortal == null || thisPortal.pos == null) {
-			System.out.println("unable to the location of this portal");
 			return;
 		}
 
@@ -87,7 +84,6 @@ public class ItemTeletoryPortalLinker extends Item {
 
 	private void linkPortalWithOrigin(EntityPlayer player, World world, ItemStack stack, ControlBlockLocation thisPortal,
 			PortalLinkerOrigin remoteInfo) {
-		System.out.println("attempting to link the two portals");
 
 		ControlBlockLocation remotePortal = findControllerBlock(world, remoteInfo.pos, STANDARD_SIZER);
 
@@ -95,7 +91,6 @@ public class ItemTeletoryPortalLinker extends Item {
 		stack.setTagInfo("dimid", new NBTTagInt(0));
 		
 		if (remotePortal == null) {
-			System.out.println("remote portal not found, exiting");
 			return;
 		}
 
@@ -110,11 +105,6 @@ public class ItemTeletoryPortalLinker extends Item {
 		int side = getSide(player, thisPortal);
 
 		stack.setTagInfo("side", new NBTTagInt(side));
-
-		if (!player.world.isRemote) {
-			System.out
-					.println("player[" + player.getPosition() + "] portal[" + thisPortal.pos + "] axis[" + thisPortal.axis + "] side[" + side + "]");
-		}
 
 		// TODO play sound and particle effects
 
@@ -133,8 +123,6 @@ public class ItemTeletoryPortalLinker extends Item {
 	}
 
 	private void linkPortalTo(World world, ControlBlockLocation from, ControlBlockLocation to, int remoteDimId, int remoteSide) {
-		System.out.println("link " + from.pos + " to " + to.pos);
-
 		Size size = STANDARD_SIZER.get(world, from.pos, from.axis);
 		size.placePortalBlocks(BlockLinkedTeletoryPortal.INSTANCE);
 
@@ -142,7 +130,6 @@ public class ItemTeletoryPortalLinker extends Item {
 			return;
 		}
 
-		System.out.println("placing title entity at " + from.pos);
 		TileEntityLinkedTeletoryPortal te = new TileEntityLinkedTeletoryPortal();
 		te.setDimId(remoteDimId);
 		te.setDestination(to.pos);
