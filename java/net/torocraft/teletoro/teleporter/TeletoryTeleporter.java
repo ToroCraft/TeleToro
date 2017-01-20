@@ -45,11 +45,13 @@ public class TeletoryTeleporter extends Teleporter {
 	public boolean placeInExistingPortal(Entity entity, float rotationYaw) {
 		PortalSearchState state = new PortalSearchState(entity, world);
 
-		if (portalIsCached(state.longXZPair)) {
-			readCachedPortal(state);
-		} else {
+		
+		//TODO fix cache issue
+		//if (portalIsCached(state.longXZPair)) {
+		//	readCachedPortal(state);
+		//} else {
 			searchForNearbyPortals(state);
-		}
+		//}
 
 		if (noPortalFound(state.distance)) {
 			return false;

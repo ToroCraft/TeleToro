@@ -1,5 +1,6 @@
 package net.torocraft.teletoro.blocks;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -17,6 +18,12 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToro;
 import net.torocraft.teletoro.item.ItemTeletoryPortalLinker;
 import net.torocraft.teletoro.item.ItemTeletoryPortalLinker.ControlBlockLocation;
+
+//TODO create linked portals, break one, the other still works
+
+//TODO figure out player placement (point player towards the side that was clicked on when linking)
+
+//TODO when a linked portal collapses, break the remote too
 
 public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements ITileEntityProvider {
 
@@ -41,10 +48,14 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 		ModelResourceLocation model = new ModelResourceLocation(TeleToro.MODID + ":" + NAME, "inventory");
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(ITEM_INSTANCE, 0, model);
 	}
+	
+	public BlockLinkedTeletoryPortal () {
+		 this.isBlockContainer = true;
+	}
 
 	@Override
 	public Size getSizer(World worldIn, BlockPos p_i45694_2_, Axis p_i45694_3_) {
-		return new BlockTeletoryPortal.Size(worldIn, p_i45694_2_, p_i45694_3_);
+		return new BlockLinkedTeletoryPortal.Size(worldIn, p_i45694_2_, p_i45694_3_);
 	}
 
 	@Override
@@ -52,34 +63,70 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 		teleport(player, pos);
 	}
 
-	private void teleport(EntityPlayerMP player, BlockPos pos) {
-		ControlBlockLocation thisPortal = ItemTeletoryPortalLinker.findControllerBlock(player.world, pos);
-		TileEntityLinkedTeletoryPortal te = getTileEntity(player, pos);
+	private void teleport(EntityPlayerMP player, BlockPos thisPortalLocation) {
+		ControlBlockLocation thisPortal = ItemTeletoryPortalLinker.findControllerBlock(player.world, thisPortalLocation, ItemTeletoryPortalLinker.LINKED_SIZER);
 
-		if (te == null || thisPortal == null) {
+		if (thisPortal == null) {
+			//TODO break; 
+			
+			System.out.println("this portal is null");
+			return;
+		}
+
+		TileEntityLinkedTeletoryPortal te = getTileEntity(player, thisPortal.pos);
+
+		if (te == null) {
+			breakPortal(player, thisPortalLocation);
+			System.out.println("te is null");
 			return;
 		}
 
 		if (te.getDimId() != player.dimension) {
 			// TODO support change dimension to specific place
 			// Teletory.changeEntityDimension(player, TeleportorType.PORTAL);
-			System.out.println("Handle inter dimensional links");
+		
+			breakPortal(player, thisPortalLocation);
+			System.out.println("Handle inter dimensional links ... not currenlty supported");
+			return;
+		}
+		
+		if(te.getDestination() == null){
+			
+			breakPortal(player, thisPortalLocation);
+			System.out.println("detination not set");
 			return;
 		}
 
 		// find remote control block and verify portal
 
-		ControlBlockLocation remotePortal = ItemTeletoryPortalLinker.findControllerBlock(player.world, te.getDestination());
+		ControlBlockLocation remotePortal = ItemTeletoryPortalLinker.findControllerBlock(player.world, te.getDestination(), ItemTeletoryPortalLinker.LINKED_SIZER);
 
 		if (remotePortal == null) {
-			// TODO also verify if the remote portal points back here, if not
-			// break
-			player.world.setBlockState(pos, Blocks.AIR.getDefaultState());
+			System.out.println("linked remote portal not found");
+			breakPortal(player, thisPortalLocation);
 			return;
 		}
 
+		System.out.println("teleporting to " + remotePortal.pos);
+
 		// TODO correct yaw based on facing of remote portal
-		player.connection.setPlayerLocation(remotePortal.pos.getX(), remotePortal.pos.getX(), remotePortal.pos.getX(), player.rotationYaw,
+		float yaw;
+		if(Axis.X.equals( remotePortal.axis)){
+			if(te.getSide() == 1){
+				yaw = 0;
+			}else{
+				yaw = 180;
+			}
+		}else{
+			if(te.getSide() == 1){
+				yaw = -90;
+			}else{
+				yaw = 90;
+			}
+		}
+		
+		
+		player.connection.setPlayerLocation(remotePortal.pos.getX() + 0.5, remotePortal.pos.getY(), remotePortal.pos.getZ() + 0.5, yaw,
 				player.rotationPitch);
 
 		// TODO support other entities
@@ -87,6 +134,10 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 		// entityIn.rotationPitch);
 
 		// slap the player
+	}
+
+	private void breakPortal(EntityPlayerMP player, BlockPos thisPortalLocation) {
+		player.world.setBlockState(thisPortalLocation, Blocks.AIR.getDefaultState());
 	}
 
 	private TileEntityLinkedTeletoryPortal getTileEntity(EntityPlayerMP player, BlockPos pos) {
@@ -97,10 +148,6 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 		}
 	}
 
-	@Override
-	public BlockAbstractPortal getPortalBlock() {
-		return INSTANCE;
-	}
 
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
@@ -109,8 +156,32 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 
 	@Override
 	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+		collapseRemotePortal(world, world.getTileEntity(pos));
 		super.breakBlock(world, pos, state);
 		world.removeTileEntity(pos);
+	}
+
+	private void collapseRemotePortal(World world, TileEntity te) {
+		
+		System.out.println("attempt to collapse remote");
+		
+		if(te == null || !(te instanceof TileEntityLinkedTeletoryPortal)){
+			System.out.println("remote te not found");
+			return;
+		}
+		BlockPos remotePos = ((TileEntityLinkedTeletoryPortal)te).getDestination();
+		if(remotePos == null){
+			System.out.println("remote control block not found");
+			return;
+		}
+		
+		if(world.getBlockState(remotePos) == BlockLinkedTeletoryPortal.INSTANCE){
+			System.out.println("collapse it");
+			world.setBlockState(remotePos, Blocks.AIR.getDefaultState());
+		}else{
+			System.out.println("remote location is not a portal");
+		}
+		
 	}
 
 	/**
@@ -125,6 +196,24 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 		super.eventReceived(state, worldIn, pos, id, param);
 		TileEntity tileentity = worldIn.getTileEntity(pos);
 		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+	}
+
+	public static class Size extends BlockAbstractPortal.Size {
+
+		public Size(World world, BlockPos pos, Axis axis) {
+			super(world, pos, axis);
+		}
+
+		@Override
+		public Block getFrameBlock() {
+			return BlockEnder.INSTANCE;
+		}
+		
+		@Override
+		public BlockAbstractPortal getPortalBlock() {
+			return INSTANCE;
+		}
+
 	}
 
 }

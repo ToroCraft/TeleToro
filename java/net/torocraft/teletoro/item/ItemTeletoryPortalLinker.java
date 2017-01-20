@@ -8,6 +8,9 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagByte;
+import net.minecraft.nbt.NBTTagInt;
+import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
@@ -20,6 +23,7 @@ import net.torocraft.teletoro.TeleToro;
 import net.torocraft.teletoro.blocks.BlockAbstractPortal.Size;
 import net.torocraft.teletoro.blocks.BlockLinkedTeletoryPortal;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
+import net.torocraft.teletoro.blocks.TileEntityLinkedTeletoryPortal;
 
 public class ItemTeletoryPortalLinker extends Item {
 
@@ -44,6 +48,7 @@ public class ItemTeletoryPortalLinker extends Item {
 		setUnlocalizedName(NAME);
 		this.maxStackSize = 16;
 		this.setCreativeTab(CreativeTabs.MISC);
+
 	}
 
 	@Override
@@ -51,37 +56,122 @@ public class ItemTeletoryPortalLinker extends Item {
 			float hitZ) {
 		Block block = world.getBlockState(pos).getBlock();
 		if (block == BlockTeletoryPortal.INSTANCE) {
-			onItemUsedOnPortalBlock(world, pos, player.getHeldItem(hand));
+			onItemUsedOnPortalBlock(player, world, pos, player.getHeldItem(hand));
 		}
 
 		return EnumActionResult.PASS;
 	}
 
-	private void onItemUsedOnPortalBlock(World world, BlockPos pos, ItemStack stack) {
+	private void onItemUsedOnPortalBlock(EntityPlayer player, World world, BlockPos pos, ItemStack stack) {
+
 		if (stack == null || stack.getItem() != INSTANCE) {
+			System.out.println("incorrect item used");
 			return;
 		}
 
-		ControlBlockLocation loc = findControllerBlock(world, pos);
+		ControlBlockLocation thisPortal = findControllerBlock(world, pos, STANDARD_SIZER);
 
-		if (loc == null) {
+		if (thisPortal == null || thisPortal.pos == null) {
+			System.out.println("unable to the location of this portal");
 			return;
 		}
 
-		// stack.get
+		PortalLinkerOrigin remoteInfo = getLinkOrigin(stack);
 
-		// if item already has a portal location
-
-		BlockTeletoryPortal.Size size = new BlockTeletoryPortal.Size(world, loc.pos, loc.axis);
-		size.placePortalBlocks(BlockLinkedTeletoryPortal.INSTANCE);
-
-		world.setTileEntity(loc.pos, null);
+		if (remoteInfo == null || remoteInfo.pos == null) {
+			setOriginPortal(player, stack, thisPortal);
+		} else {
+			linkPortalWithOrigin(player, world, stack, thisPortal, remoteInfo);
+		}
 	}
 
-	// private BlockPos get TODO get linker status
+	private void linkPortalWithOrigin(EntityPlayer player, World world, ItemStack stack, ControlBlockLocation thisPortal,
+			PortalLinkerOrigin remoteInfo) {
+		System.out.println("attempting to link the two portals");
 
-	public static ControlBlockLocation findControllerBlock(World world, BlockPos pos) {
-		Size size = new BlockTeletoryPortal.Size(world, pos, Axis.X);
+		ControlBlockLocation remotePortal = findControllerBlock(world, remoteInfo.pos, STANDARD_SIZER);
+
+		stack.setTagInfo("origin", new NBTTagLong(0));
+		stack.setTagInfo("dimid", new NBTTagInt(0));
+		
+		if (remotePortal == null) {
+			System.out.println("remote portal not found, exiting");
+			return;
+		}
+
+		linkPortalTo(world, thisPortal, remotePortal, remoteInfo.dimId, remoteInfo.side);
+		linkPortalTo(world, remotePortal, thisPortal, player.dimension, getSide(player, thisPortal));
+	}
+
+	private void setOriginPortal(EntityPlayer player, ItemStack stack, ControlBlockLocation thisPortal) {
+		stack.setTagInfo("origin", new NBTTagLong(thisPortal.pos.toLong()));
+		stack.setTagInfo("dimid", new NBTTagInt(player.dimension));
+
+		int side = getSide(player, thisPortal);
+
+		stack.setTagInfo("side", new NBTTagInt(side));
+
+		if (!player.world.isRemote) {
+			System.out
+					.println("player[" + player.getPosition() + "] portal[" + thisPortal.pos + "] axis[" + thisPortal.axis + "] side[" + side + "]");
+		}
+
+		// TODO play sound and particle effects
+
+		// TODO linker item should be visible different
+
+	}
+
+	private int getSide(EntityPlayer player, ControlBlockLocation thisPortal) {
+		int side;
+		if (Axis.X.equals(thisPortal.axis)) {
+			side = player.getPosition().getZ() > thisPortal.pos.getZ() ? 1 : 0;
+		} else {
+			side = player.getPosition().getX() > thisPortal.pos.getX() ? 1 : 0;
+		}
+		return side;
+	}
+
+	private void linkPortalTo(World world, ControlBlockLocation from, ControlBlockLocation to, int remoteDimId, int remoteSide) {
+		System.out.println("link " + from.pos + " to " + to.pos);
+
+		Size size = STANDARD_SIZER.get(world, from.pos, from.axis);
+		size.placePortalBlocks(BlockLinkedTeletoryPortal.INSTANCE);
+
+		if (world.isRemote) {
+			return;
+		}
+
+		System.out.println("placing title entity at " + from.pos);
+		TileEntityLinkedTeletoryPortal te = new TileEntityLinkedTeletoryPortal();
+		te.setDimId(remoteDimId);
+		te.setDestination(to.pos);
+		te.setSide(remoteSide);
+		world.setTileEntity(from.pos, te);
+	}
+
+	private PortalLinkerOrigin getLinkOrigin(ItemStack stack) {
+		if (!stack.hasTagCompound()) {
+			return null;
+		}
+
+		long serializedPos = stack.getTagCompound().getLong("origin");
+
+		if (serializedPos == 0) {
+			return null;
+		}
+
+		PortalLinkerOrigin o = new PortalLinkerOrigin();
+		o.dimId = stack.getTagCompound().getInteger("dimid");
+		o.pos = BlockPos.fromLong(serializedPos);
+		o.side = stack.getTagCompound().getInteger("side");
+
+		return o;
+
+	}
+
+	public static ControlBlockLocation findControllerBlock(World world, BlockPos pos, SizerFactory sizerFactory) {
+		Size size = sizerFactory.get(world, pos, Axis.X);
 
 		ControlBlockLocation loc = new ControlBlockLocation();
 
@@ -91,7 +181,7 @@ public class ItemTeletoryPortalLinker extends Item {
 			return loc;
 		}
 
-		size = new BlockTeletoryPortal.Size(world, pos, Axis.Z);
+		size = sizerFactory.get(world, pos, Axis.Z);
 
 		if (size.isValid()) {
 			loc.pos = size.getBottomLeft();
@@ -102,9 +192,32 @@ public class ItemTeletoryPortalLinker extends Item {
 		return null;
 	}
 
+	public static interface SizerFactory {
+		Size get(World world, BlockPos pos, Axis axis);
+	}
+
+	public static final SizerFactory STANDARD_SIZER = new SizerFactory() {
+		@Override
+		public Size get(World world, BlockPos pos, Axis axis) {
+			return new BlockTeletoryPortal.Size(world, pos, axis);
+		}
+	};
+
+	public static final SizerFactory LINKED_SIZER = new SizerFactory() {
+		@Override
+		public Size get(World world, BlockPos pos, Axis axis) {
+			return new BlockLinkedTeletoryPortal.Size(world, pos, axis);
+		}
+	};
+
 	public static class ControlBlockLocation {
 		public Axis axis;
 		public BlockPos pos;
 	}
 
+	public static class PortalLinkerOrigin {
+		public BlockPos pos;
+		public int dimId;
+		public int side;
+	}
 }

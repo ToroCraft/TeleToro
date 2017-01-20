@@ -11,6 +11,7 @@ import net.torocraft.teletoro.blocks.BlockEnder;
 import net.torocraft.teletoro.blocks.BlockEnderOre;
 import net.torocraft.teletoro.blocks.BlockLinkedTeletoryPortal;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
+import net.torocraft.teletoro.blocks.TileEntityLinkedTeletoryPortal;
 import net.torocraft.teletoro.item.EntityTeletoryPearl;
 import net.torocraft.teletoro.item.ItemTeletoryPearl;
 import net.torocraft.teletoro.item.ItemTeletoryPortalLinker;
@@ -29,6 +30,8 @@ public class CommonProxy {
 		BlockLinkedTeletoryPortal.init();
 		BlockEnder.init();
 		BlockEnderOre.init();
+		
+		TileEntityLinkedTeletoryPortal.init();
 
 		ItemTeletoryPearl.init();
 		ItemTeletoryPortalLinker.init();

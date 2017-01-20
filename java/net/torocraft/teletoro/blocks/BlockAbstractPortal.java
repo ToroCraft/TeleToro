@@ -73,19 +73,17 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 		return false;
 	}
 
-	public abstract BlockAbstractPortal getPortalBlock();
-
 	public boolean trySpawnPortal(World worldIn, BlockPos pos) {
 		Size size = getSizer(worldIn, pos, EnumFacing.Axis.X);
 
 		if (size.isValid() && size.portalBlockCount == 0) {
-			size.placePortalBlocks(getPortalBlock());
+			size.placePortalBlocks();
 			return true;
 		} else {
 			Size size1 = getSizer(worldIn, pos, EnumFacing.Axis.Z);
 
 			if (size1.isValid() && size1.portalBlockCount == 0) {
-				size1.placePortalBlocks(getPortalBlock());
+				size1.placePortalBlocks();
 				return true;
 			} else {
 				return false;
@@ -312,6 +310,7 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 		private int width;
 
 		public abstract Block getFrameBlock();
+		public abstract BlockAbstractPortal getPortalBlock();
 
 		public Size(World worldIn, BlockPos pos, Axis axis) {
 			this.world = worldIn;
@@ -384,7 +383,7 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 						break label24;
 					}
 
-					if (block == BlockTeletoryPortal.INSTANCE) {
+					if (block == getPortalBlock()) {
 						++this.portalBlockCount;
 					}
 
@@ -427,12 +426,16 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 		}
 
 		protected boolean isEmptyBlock(Block blockIn) {
-			return getMaterial(blockIn) == Material.AIR || blockIn == Blocks.FIRE || blockIn == BlockTeletoryPortal.INSTANCE;
+			return getMaterial(blockIn) == Material.AIR || blockIn == Blocks.FIRE || blockIn == getPortalBlock();
 		}
 
 		public boolean isValid() {
 			boolean valid = this.bottomLeft != null && this.width >= 2 && this.width <= 21 && this.height >= 3 && this.height <= 21;
 			return valid;
+		}
+		
+		public void placePortalBlocks() {
+			placePortalBlocks(getPortalBlock());
 		}
 
 		public void placePortalBlocks(BlockAbstractPortal portalBlock) {

@@ -26,24 +26,7 @@ public class FallFromTeletoryTeleporter extends Teleporter {
 
 	public boolean placeInExistingPortal(Entity entity, float rotationYaw) {
 		PortalSearchState search = new PortalSearchState(entity, world);
-		if (entity.dimension == Teletory.DIMID) {
-			return fallIntoTeletory(entity, rotationYaw, search);
-		} else {
-			return fallIntoOverWorld(entity, rotationYaw, search);
-		}
-	}
-
-	protected boolean fallIntoTeletory(Entity entity, float rotationYaw, PortalSearchState search) {
-
-		double x = MathHelper.floor(search.xEntity);
-		double y = 25;
-		double z = MathHelper.floor(search.zEntity);
-
-		entity.fallDistance = 0;
-		entity.velocityChanged = true;
-
-		entity.setLocationAndAngles(x, y, z, rotationYaw, -5);
-		return true;
+		return fallIntoOverWorld(entity, rotationYaw, search);
 	}
 
 	protected boolean fallIntoOverWorld(Entity entity, float rotationYaw, PortalSearchState search) {
