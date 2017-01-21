@@ -20,7 +20,7 @@ import net.torocraft.teletoro.material.ArmorMaterials;
 
 public class CommonProxy {
 	public void preInit(FMLPreInitializationEvent e) {
-
+		ItemTeletoryPortalLinker.init();
 	}
 
 	public void init(FMLInitializationEvent e) {
@@ -34,7 +34,7 @@ public class CommonProxy {
 		TileEntityLinkedTeletoryPortal.init();
 
 		ItemTeletoryPearl.init();
-		ItemTeletoryPortalLinker.init();
+		
 		EntityTeletoryPearl.init(150);
 		setupTheTeletory(e);
 		GameRegistry.addRecipe(new ItemStack(BlockEnder.INSTANCE), "##", "##", '#', Items.ENDER_PEARL);

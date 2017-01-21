@@ -1,0 +1,6 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "teletoro:items/teletory_portal_linker_on"
+    }
+}

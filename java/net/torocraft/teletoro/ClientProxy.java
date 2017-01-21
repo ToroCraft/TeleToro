@@ -16,6 +16,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
+        ItemTeletoryPortalLinker.registerRenders();
     }
 
     @Override
@@ -27,7 +28,7 @@ public class ClientProxy extends CommonProxy {
 		BlockEnderOre.registerRenders();
 		BlockLinkedTeletoryPortal.registerRenders();
 		ItemTeletoryPearl.registerRenders();
-		ItemTeletoryPortalLinker.registerRenders();
+		
     }
 
     @Override

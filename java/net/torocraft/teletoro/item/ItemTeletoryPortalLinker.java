@@ -2,7 +2,7 @@ package net.torocraft.teletoro.item;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,6 +19,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToro;
 import net.torocraft.teletoro.blocks.BlockAbstractPortal.Size;
@@ -29,8 +30,9 @@ import net.torocraft.teletoro.blocks.TileEntityLinkedTeletoryPortal;
 public class ItemTeletoryPortalLinker extends Item {
 
 	public static ItemTeletoryPortalLinker INSTANCE;
-
 	public static final String NAME = "teletory_portal_linker";
+	private static ModelResourceLocation model = new ModelResourceLocation(TeleToro.MODID + ":" + NAME, "inventory");
+	private static ModelResourceLocation modelOn = new ModelResourceLocation(TeleToro.MODID + ":" + NAME + "_on", "inventory");
 
 	public static void init() {
 		INSTANCE = new ItemTeletoryPortalLinker();
@@ -39,10 +41,22 @@ public class ItemTeletoryPortalLinker extends Item {
 	}
 
 	public static void registerRenders() {
-		ModelResourceLocation model = new ModelResourceLocation(TeleToro.MODID + ":" + NAME, "inventory");
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(INSTANCE, 0, model);
-		RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
-		renderItem.getItemModelMesher().register(INSTANCE, 0, new ModelResourceLocation(TeleToro.MODID + ":" + NAME, "inventory"));
+		ModelLoader.setCustomMeshDefinition(INSTANCE, new ItemMeshDefinition() {
+			@Override
+			public ModelResourceLocation getModelLocation(ItemStack stack) {
+				if (isActive(stack)) {
+					return modelOn;
+				}else{
+					return model;
+				}
+			}
+		});
+		ModelLoader.registerItemVariants(INSTANCE, new ModelResourceLocation[]{model, modelOn});
+	}
+
+	public static boolean isActive(ItemStack stack) {
+		PortalLinkerOrigin remoteInfo = ItemTeletoryPortalLinker.getLinkOrigin(stack);
+		return remoteInfo != null && remoteInfo.pos != null;
 	}
 
 	public ItemTeletoryPortalLinker() {
@@ -62,8 +76,6 @@ public class ItemTeletoryPortalLinker extends Item {
 
 		return EnumActionResult.PASS;
 	}
-	
-	
 
 	private void onItemUsedOnPortalBlock(EntityPlayer player, World world, BlockPos pos, ItemStack stack) {
 
@@ -85,6 +97,7 @@ public class ItemTeletoryPortalLinker extends Item {
 
 		if (remoteInfo == null || remoteInfo.pos == null) {
 			setOriginPortal(player, stack, thisPortal);
+			
 		} else {
 			linkPortalWithOrigin(player, world, stack, thisPortal, remoteInfo);
 		}
@@ -117,8 +130,8 @@ public class ItemTeletoryPortalLinker extends Item {
 	}
 
 	private void playSound(EntityPlayer player) {
-		player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ENDERMEN_TELEPORT, SoundCategory.PLAYERS,
-				1.0F, 1.0F);
+		player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ENDERMEN_TELEPORT,
+				SoundCategory.PLAYERS, 1.0F, 1.0F);
 	}
 
 	private int getSide(EntityPlayer player, ControlBlockLocation thisPortal) {
@@ -153,7 +166,7 @@ public class ItemTeletoryPortalLinker extends Item {
 		});
 	}
 
-	private PortalLinkerOrigin getLinkOrigin(ItemStack stack) {
+	private static PortalLinkerOrigin getLinkOrigin(ItemStack stack) {
 		if (!stack.hasTagCompound()) {
 			return null;
 		}
@@ -223,4 +236,5 @@ public class ItemTeletoryPortalLinker extends Item {
 		public int dimId;
 		public int side;
 	}
+
 }
