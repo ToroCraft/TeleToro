@@ -1,11 +1,10 @@
 package net.torocraft.teletoro.item;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -19,9 +18,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToro;
+import net.torocraft.teletoro.Teletory;
 import net.torocraft.teletoro.blocks.BlockAbstractPortal.Size;
 import net.torocraft.teletoro.blocks.BlockLinkedTeletoryPortal;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
@@ -31,27 +30,13 @@ public class ItemTeletoryPortalLinker extends Item {
 
 	public static ItemTeletoryPortalLinker INSTANCE;
 	public static final String NAME = "teletory_portal_linker";
-	private static ModelResourceLocation model = new ModelResourceLocation(TeleToro.MODID + ":" + NAME, "inventory");
-	private static ModelResourceLocation modelOn = new ModelResourceLocation(TeleToro.MODID + ":" + NAME + "_on", "inventory");
+	public static ModelResourceLocation model = new ModelResourceLocation(TeleToro.MODID + ":" + NAME, "inventory");
+	public static ModelResourceLocation modelOn = new ModelResourceLocation(TeleToro.MODID + ":" + NAME + "_on", "inventory");
 
 	public static void init() {
 		INSTANCE = new ItemTeletoryPortalLinker();
 		ResourceLocation resourceName = new ResourceLocation(TeleToro.MODID, NAME.toLowerCase());
 		GameRegistry.register(INSTANCE, resourceName);
-	}
-
-	public static void registerRenders() {
-		ModelLoader.setCustomMeshDefinition(INSTANCE, new ItemMeshDefinition() {
-			@Override
-			public ModelResourceLocation getModelLocation(ItemStack stack) {
-				if (isActive(stack)) {
-					return modelOn;
-				}else{
-					return model;
-				}
-			}
-		});
-		ModelLoader.registerItemVariants(INSTANCE, new ModelResourceLocation[]{model, modelOn});
 	}
 
 	public static boolean isActive(ItemStack stack) {
@@ -87,7 +72,7 @@ public class ItemTeletoryPortalLinker extends Item {
 		if (stack == null || stack.getItem() != INSTANCE) {
 			return;
 		}
-		
+
 		ControlBlockLocation thisPortal = findControllerBlock(world, pos, STANDARD_SIZER);
 
 		if (thisPortal == null || thisPortal.pos == null) {
@@ -98,7 +83,7 @@ public class ItemTeletoryPortalLinker extends Item {
 
 		if (remoteInfo == null || remoteInfo.pos == null) {
 			setOriginPortal(player, stack, thisPortal);
-			
+
 		} else {
 			linkPortalWithOrigin(player, world, stack, thisPortal, remoteInfo);
 		}
@@ -148,24 +133,19 @@ public class ItemTeletoryPortalLinker extends Item {
 
 	private void linkPortalTo(final World world, final ControlBlockLocation from, final ControlBlockLocation to, final int remoteDimId,
 			final int remoteSide) {
-		Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+
+		final Size size = STANDARD_SIZER.get(world, from.pos, from.axis);
+		Teletory.runQueue.put(new Runnable() {
 			@Override
 			public void run() {
-				Size size = STANDARD_SIZER.get(world, from.pos, from.axis);
-				size.placePortalBlocks(null);
 				size.placePortalBlocks(BlockLinkedTeletoryPortal.INSTANCE);
-
-				if (world.isRemote) {
-					return;
-				}
-
 				TileEntityLinkedTeletoryPortal te = new TileEntityLinkedTeletoryPortal();
 				te.setDimId(remoteDimId);
 				te.setDestination(to.pos);
 				te.setSide(remoteSide);
 				world.setTileEntity(from.pos, te);
 			}
-		});
+		}, 0);
 	}
 
 	private static PortalLinkerOrigin getLinkOrigin(ItemStack stack) {

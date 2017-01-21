@@ -16,8 +16,8 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -28,6 +28,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.torocraft.teletoro.TeleToro;
 import net.torocraft.teletoro.TeleToroUtil;
+import net.torocraft.teletoro.Teletory;
 import net.torocraft.teletoro.item.ItemTeletoryPortalLinker;
 import net.torocraft.teletoro.item.ItemTeletoryPortalLinker.ControlBlockLocation;
 
@@ -132,11 +133,16 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 		player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ENDERMEN_TELEPORT,
 				SoundCategory.PLAYERS, 1.0F, 1.0F);
 
-		player.connection.setPlayerLocation(transportTo.xCoord, transportTo.yCoord, transportTo.zCoord, yaw, player.rotationPitch);
+		
 
-		Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+		Teletory.runQueue.put(new Runnable() {
 			@Override
 			public void run() {
+				
+				player.motionX = 0.0D;
+				player.motionY = 0.0D;
+				player.motionZ = 0.0D;
+				player.connection.setPlayerLocation(transportTo.xCoord, transportTo.yCoord, transportTo.zCoord, yaw, player.rotationPitch);
 
 				TeleToroUtil.setInvulnerableDimensionChange(player, false);
 
@@ -145,7 +151,7 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 
 				hurtPlayer(player, transportTo);
 			}
-		});
+		}, 0);
 
 		// TODO support other entities
 

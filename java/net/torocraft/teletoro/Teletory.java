@@ -50,7 +50,7 @@ public class Teletory {
 	public static final int DIMID = 16;
 	public static final DimensionType TYPE = DimensionType.register("teletory", "_teletory", DIMID, TeletoryWorldProvider.class, true);
 
-	private static ConcurrentHashMap<Runnable, Integer> runQueue = new ConcurrentHashMap<Runnable, Integer>();
+	public static ConcurrentHashMap<Runnable, Integer> runQueue = new ConcurrentHashMap<Runnable, Integer>();
 
 	public static void changeEntityDimension(final Entity entity, final TeleportorType type) {
 		runQueue.put(new TeleportRunner(entity, type), 0);
