@@ -61,7 +61,8 @@ public class ItemTeletoryPortalLinker extends Item {
 
 	public ItemTeletoryPortalLinker() {
 		setUnlocalizedName(NAME);
-		this.maxStackSize = 16;
+		this.maxStackSize = 1;
+		this.setMaxDamage(2);
 		this.setCreativeTab(CreativeTabs.MISC);
 
 	}
@@ -86,7 +87,7 @@ public class ItemTeletoryPortalLinker extends Item {
 		if (stack == null || stack.getItem() != INSTANCE) {
 			return;
 		}
-
+		
 		ControlBlockLocation thisPortal = findControllerBlock(world, pos, STANDARD_SIZER);
 
 		if (thisPortal == null || thisPortal.pos == null) {
@@ -119,6 +120,7 @@ public class ItemTeletoryPortalLinker extends Item {
 		linkPortalTo(world, remotePortal, thisPortal, player.dimension, getSide(player, thisPortal));
 
 		playSound(player);
+		stack.damageItem(1, player);
 	}
 
 	private void setOriginPortal(EntityPlayer player, ItemStack stack, ControlBlockLocation thisPortal) {

@@ -37,6 +37,7 @@ public class CommonProxy {
 		
 		EntityTeletoryPearl.init(150);
 		setupTheTeletory(e);
+		GameRegistry.addRecipe(new ItemStack(ItemTeletoryPortalLinker.INSTANCE), "  b", " p ", "p  ", 'b', BlockEnder.INSTANCE, 'p',  ItemTeletoryPearl.INSTANCE);
 		GameRegistry.addRecipe(new ItemStack(BlockEnder.INSTANCE), "##", "##", '#', Items.ENDER_PEARL);
 		GameRegistry.addSmelting(BlockEnderOre.ITEM_INSTANCE, new ItemStack(ItemTeletoryPearl.INSTANCE), 1);
 		GameRegistry.addSmelting(new ItemStack(ItemTeletoryPearl.INSTANCE), new ItemStack(Items.ENDER_PEARL), 1);
