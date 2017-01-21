@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagInt;
@@ -15,6 +16,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -60,8 +62,14 @@ public class ItemTeletoryPortalLinker extends Item {
 
 		return EnumActionResult.PASS;
 	}
+	
+	
 
 	private void onItemUsedOnPortalBlock(EntityPlayer player, World world, BlockPos pos, ItemStack stack) {
+
+		if (world.isRemote) {
+			return;
+		}
 
 		if (stack == null || stack.getItem() != INSTANCE) {
 			return;
@@ -89,27 +97,28 @@ public class ItemTeletoryPortalLinker extends Item {
 
 		stack.setTagInfo("origin", new NBTTagLong(0));
 		stack.setTagInfo("dimid", new NBTTagInt(0));
-		
+
 		if (remotePortal == null) {
 			return;
 		}
 
 		linkPortalTo(world, thisPortal, remotePortal, remoteInfo.dimId, remoteInfo.side);
 		linkPortalTo(world, remotePortal, thisPortal, player.dimension, getSide(player, thisPortal));
+
+		playSound(player);
 	}
 
 	private void setOriginPortal(EntityPlayer player, ItemStack stack, ControlBlockLocation thisPortal) {
 		stack.setTagInfo("origin", new NBTTagLong(thisPortal.pos.toLong()));
 		stack.setTagInfo("dimid", new NBTTagInt(player.dimension));
-
 		int side = getSide(player, thisPortal);
-
 		stack.setTagInfo("side", new NBTTagInt(side));
+		playSound(player);
+	}
 
-		// TODO play sound and particle effects
-
-		// TODO linker item should be visible different
-
+	private void playSound(EntityPlayer player) {
+		player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ENDERMEN_TELEPORT, SoundCategory.PLAYERS,
+				1.0F, 1.0F);
 	}
 
 	private int getSide(EntityPlayer player, ControlBlockLocation thisPortal) {
@@ -122,19 +131,26 @@ public class ItemTeletoryPortalLinker extends Item {
 		return side;
 	}
 
-	private void linkPortalTo(World world, ControlBlockLocation from, ControlBlockLocation to, int remoteDimId, int remoteSide) {
-		Size size = STANDARD_SIZER.get(world, from.pos, from.axis);
-		size.placePortalBlocks(BlockLinkedTeletoryPortal.INSTANCE);
+	private void linkPortalTo(final World world, final ControlBlockLocation from, final ControlBlockLocation to, final int remoteDimId,
+			final int remoteSide) {
+		Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+			@Override
+			public void run() {
+				Size size = STANDARD_SIZER.get(world, from.pos, from.axis);
+				size.placePortalBlocks(null);
+				size.placePortalBlocks(BlockLinkedTeletoryPortal.INSTANCE);
 
-		if (world.isRemote) {
-			return;
-		}
+				if (world.isRemote) {
+					return;
+				}
 
-		TileEntityLinkedTeletoryPortal te = new TileEntityLinkedTeletoryPortal();
-		te.setDimId(remoteDimId);
-		te.setDestination(to.pos);
-		te.setSide(remoteSide);
-		world.setTileEntity(from.pos, te);
+				TileEntityLinkedTeletoryPortal te = new TileEntityLinkedTeletoryPortal();
+				te.setDimId(remoteDimId);
+				te.setDestination(to.pos);
+				te.setSide(remoteSide);
+				world.setTileEntity(from.pos, te);
+			}
+		});
 	}
 
 	private PortalLinkerOrigin getLinkOrigin(ItemStack stack) {

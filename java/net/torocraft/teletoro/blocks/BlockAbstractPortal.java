@@ -189,6 +189,7 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 		return BlockRenderLayer.TRANSLUCENT;
 	}
 
+	@Override
 	@SideOnly(Side.CLIENT)
 	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		for (int i = 0; i < 4; ++i) {
@@ -443,7 +444,13 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 				BlockPos blockpos = this.bottomLeft.offset(this.rightDir, i);
 
 				for (int j = 0; j < this.height; ++j) {
-					this.world.setBlockState(blockpos.up(j), portalBlock.getDefaultState().withProperty(BlockAbstractPortal.AXIS, this.axis), 2);
+					IBlockState blockState;
+					if(portalBlock == null){
+						blockState = Blocks.AIR.getDefaultState();
+					}else{
+						blockState = portalBlock.getDefaultState().withProperty(BlockAbstractPortal.AXIS, this.axis);
+					}
+					this.world.setBlockState(blockpos.up(j), blockState, 2);
 				}
 			}
 		}

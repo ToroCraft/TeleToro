@@ -1,26 +1,35 @@
 package net.torocraft.teletoro.blocks;
 
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityEndermite;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.torocraft.teletoro.TeleToro;
 import net.torocraft.teletoro.TeleToroUtil;
 import net.torocraft.teletoro.item.ItemTeletoryPortalLinker;
 import net.torocraft.teletoro.item.ItemTeletoryPortalLinker.ControlBlockLocation;
-
-//TODO when remote portal is out of range of client, the portal blocks do not update correct
 
 public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements ITileEntityProvider {
 
@@ -45,9 +54,9 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 		ModelResourceLocation model = new ModelResourceLocation(TeleToro.MODID + ":" + NAME, "inventory");
 		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(ITEM_INSTANCE, 0, model);
 	}
-	
-	public BlockLinkedTeletoryPortal () {
-		 this.isBlockContainer = true;
+
+	public BlockLinkedTeletoryPortal() {
+		this.isBlockContainer = true;
 	}
 
 	@Override
@@ -56,12 +65,14 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 	}
 
 	@Override
-	protected void onPlayerEnterPortal(EntityPlayerMP player, BlockPos pos) {
+	protected void onPlayerEnterPortal(final EntityPlayerMP player, final BlockPos pos) {
 		teleport(player, pos);
 	}
 
-	private void teleport(EntityPlayerMP player, BlockPos thisPortalLocation) {
-		ControlBlockLocation thisPortal = ItemTeletoryPortalLinker.findControllerBlock(player.world, thisPortalLocation, ItemTeletoryPortalLinker.LINKED_SIZER);
+	private void teleport(final EntityPlayerMP player, BlockPos thisPortalLocation) {
+
+		ControlBlockLocation thisPortal = ItemTeletoryPortalLinker.findControllerBlock(player.world, thisPortalLocation,
+				ItemTeletoryPortalLinker.LINKED_SIZER);
 
 		if (thisPortal == null) {
 			return;
@@ -80,53 +91,83 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 			breakPortal(player, thisPortalLocation);
 			return;
 		}
-		
-		if(te.getDestination() == null){
+
+		if (te.getDestination() == null) {
 			breakPortal(player, thisPortalLocation);
 			return;
 		}
 
-		ControlBlockLocation remotePortal = ItemTeletoryPortalLinker.findControllerBlock(player.world, te.getDestination(), ItemTeletoryPortalLinker.LINKED_SIZER);
+		final ControlBlockLocation remotePortal = ItemTeletoryPortalLinker.findControllerBlock(player.world, te.getDestination(),
+				ItemTeletoryPortalLinker.LINKED_SIZER);
 
 		if (remotePortal == null) {
 			breakPortal(player, thisPortalLocation);
 			return;
 		}
-		
+
 		if (player.world.getBlockState(remotePortal.pos).getBlock() != BlockLinkedTeletoryPortal.INSTANCE) {
 			breakPortal(player, thisPortalLocation);
 			return;
 		}
 
-		float yaw;
-		if(Axis.X.equals( remotePortal.axis)){
-			if(te.getSide() == 1){
+		final float yaw;
+		if (Axis.X.equals(remotePortal.axis)) {
+			if (te.getSide() == 1) {
 				yaw = 0;
-			}else{
+			} else {
 				yaw = 180;
 			}
-		}else{
-			if(te.getSide() == 1){
+		} else {
+			if (te.getSide() == 1) {
 				yaw = -90;
-			}else{
+			} else {
 				yaw = 90;
 			}
 		}
-		
-		TeleToroUtil.setInvulnerableDimensionChange(player);
-		
-		player.connection.setPlayerLocation(remotePortal.pos.getX() + 0.5, remotePortal.pos.getY(), remotePortal.pos.getZ() + 0.5, yaw,
-				player.rotationPitch);
+
+		TeleToroUtil.setInvulnerableDimensionChange(player, true);
+
+		final Vec3d transportTo = new Vec3d(remotePortal.pos.getX() + 0.5, remotePortal.pos.getY() + 0.5, remotePortal.pos.getZ() + 0.5);
+
+		player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ENDERMEN_TELEPORT,
+				SoundCategory.PLAYERS, 1.0F, 1.0F);
+
+		player.connection.setPlayerLocation(transportTo.xCoord, transportTo.yCoord, transportTo.zCoord, yaw, player.rotationPitch);
+
+		Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+			@Override
+			public void run() {
+
+				TeleToroUtil.setInvulnerableDimensionChange(player, false);
+
+				player.world.playSound((EntityPlayer) null, transportTo.xCoord, transportTo.yCoord, transportTo.zCoord,
+						SoundEvents.ENTITY_ENDERMEN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+
+				hurtPlayer(player, transportTo);
+			}
+		});
 
 		// TODO support other entities
-		// entityIn.setLocationAndAngles(d5, d6, d7, entityIn.rotationYaw,
-		// entityIn.rotationPitch);
 
-		// slap the player
+	}
+
+	private void hurtPlayer(final EntityLivingBase entity, Vec3d transportTo) {
+		entity.fallDistance = 0.0F;
+		entity.attackEntityFrom(DamageSource.FALL, 6f);
+		if (entity.world.rand.nextFloat() < 0.05F && entity.world.getGameRules().getBoolean("doMobSpawning")) {
+			EntityEndermite entityendermite = new EntityEndermite(entity.world);
+			entityendermite.setSpawnedByPlayer(true);
+			System.out.println("spawn at " + transportTo.xCoord + " " + transportTo.yCoord + " " + transportTo.zCoord);
+			entityendermite.setLocationAndAngles(transportTo.xCoord, transportTo.yCoord, transportTo.zCoord, entity.rotationYaw,
+					entity.rotationPitch);
+			entity.world.spawnEntity(entityendermite);
+		}
 	}
 
 	private void breakPortal(EntityPlayerMP player, BlockPos thisPortalLocation) {
 		player.world.setBlockState(thisPortalLocation, Blocks.AIR.getDefaultState());
+		player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1.0F,
+				1.0F);
 	}
 
 	private TileEntityLinkedTeletoryPortal getTileEntity(EntityPlayerMP player, BlockPos pos) {
@@ -137,7 +178,6 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 		}
 	}
 
-
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return null;
@@ -147,6 +187,14 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 	public void breakBlock(World world, BlockPos pos, IBlockState state) {
 		super.breakBlock(world, pos, state);
 		world.removeTileEntity(pos);
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+		/*
+		 * disable particles
+		 */
 	}
 
 	/**
@@ -173,7 +221,7 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 		public Block getFrameBlock() {
 			return BlockEnder.INSTANCE;
 		}
-		
+
 		@Override
 		public BlockAbstractPortal getPortalBlock() {
 			return INSTANCE;

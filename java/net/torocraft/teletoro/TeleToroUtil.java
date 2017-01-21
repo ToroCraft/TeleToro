@@ -16,8 +16,6 @@ public class TeleToroUtil {
 		PORTAL, FALL, PEARL, POST_TELEPORT
 	};
 
-
-
 	public static void resetStatusFields(EntityPlayerMP player) {
 		try {
 			Field lastExperience = getReflectionField("field_71144_ck", "lastExperience");
@@ -33,9 +31,13 @@ public class TeleToroUtil {
 	}
 
 	public static void setInvulnerableDimensionChange(EntityPlayerMP thePlayer) {
+		setInvulnerableDimensionChange(thePlayer, true);
+	}
+
+	public static void setInvulnerableDimensionChange(EntityPlayerMP thePlayer, boolean enable) {
 		try {
 			Field invulnerableDimensionChange = getReflectionField("field_184851_cj", "invulnerableDimensionChange");
-			invulnerableDimensionChange.setBoolean(thePlayer, true);
+			invulnerableDimensionChange.setBoolean(thePlayer, enable);
 		} catch (Exception e) {
 			throw new RuntimeException("Unable to set invulnerableDimensionChange via reflection", e);
 		}
@@ -70,6 +72,5 @@ public class TeleToroUtil {
 		}
 		return sbStr.toString();
 	}
-
 
 }
