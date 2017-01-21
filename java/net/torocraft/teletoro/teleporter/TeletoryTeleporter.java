@@ -19,6 +19,8 @@ import net.minecraft.world.WorldServer;
 import net.torocraft.teletoro.Teletory;
 import net.torocraft.teletoro.blocks.BlockEnder;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
+import net.torocraft.teletoro.item.ItemTeletoryPortalLinker;
+import net.torocraft.teletoro.item.ItemTeletoryPortalLinker.ControlBlockLocation;
 
 public class TeletoryTeleporter extends Teleporter {
 
@@ -45,13 +47,11 @@ public class TeletoryTeleporter extends Teleporter {
 	public boolean placeInExistingPortal(Entity entity, float rotationYaw) {
 		PortalSearchState state = new PortalSearchState(entity, world);
 
-		
-		//TODO fix cache issue
-		//if (portalIsCached(state.longXZPair)) {
-		//	readCachedPortal(state);
-		//} else {
+		if (portalIsCached(state.longXZPair, entity)) {
+			readCachedPortal(state);
+		} else {
 			searchForNearbyPortals(state);
-		//}
+		}
 
 		if (noPortalFound(state.distance)) {
 			return false;
@@ -134,8 +134,29 @@ public class TeletoryTeleporter extends Teleporter {
 		return this.world.getBlockState(blockpos).getBlock() == BlockTeletoryPortal.INSTANCE;
 	}
 
-	private boolean portalIsCached(long longIJPair) {
-		return this.destinationCoordinateCache.containsKey(Long.valueOf(longIJPair));
+	private boolean portalIsCached(long longIJPair, Entity entity) {
+
+		boolean cached = this.destinationCoordinateCache.containsKey(Long.valueOf(longIJPair));
+		if (cached == false) {
+			return false;
+		}
+		PortalSearchState state = new PortalSearchState(entity, world);
+
+		readCachedPortal(state);
+
+		if (state.portalPos == null) {
+			destinationCoordinateCache.remove(longIJPair);
+			return false;
+		}
+
+		ControlBlockLocation loc = ItemTeletoryPortalLinker.findControllerBlock(world, state.portalPos, ItemTeletoryPortalLinker.STANDARD_SIZER);
+		boolean found = loc != null && loc.pos != null;
+		
+		if(!found){
+			destinationCoordinateCache.remove(longIJPair);
+		}
+		
+		return found;
 	}
 
 	@Override
