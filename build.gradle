@@ -14,7 +14,7 @@ group= "net.torocraft.teletoro"
 archivesBaseName = "teletoro"
 
 minecraft {
-   version = "1.11.2-13.20.0.2222"
+   version = "1.11.2-13.20.0.2224"
    runDir = "run"
    mappings = "snapshot_20161220"
 }

@@ -28,6 +28,7 @@ import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.event.entity.living.EnderTeleportEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
@@ -251,12 +252,12 @@ public class Teletory {
 		}
 	}
 
-	private void damageEnderBoots(EntityLivingBase entity) {
+	public static void damageEnderBoots(EntityLivingBase entity) {
 		ItemStack boots = entity.getItemStackFromSlot(EntityEquipmentSlot.FEET);
 		boots.damageItem(1, entity);
 	}
 
-	private boolean isWearingEnderBoots(EntityLivingBase entity) {
+	public static boolean isWearingEnderBoots(EntityLivingBase entity) {
 		ItemStack boots = entity.getItemStackFromSlot(EntityEquipmentSlot.FEET);
 		if (boots == null || boots.getCount() != 1) {
 			return false;
@@ -323,7 +324,21 @@ public class Teletory {
 			}
 		}
 	}
+	
+	
 
+	@SubscribeEvent
+	public void enderPearlTeleport(EnderTeleportEvent ev) {
+		if (ev.getEntity().getEntityWorld().isRemote || !(ev.getEntity() instanceof EntityPlayerMP)) {
+			return;
+		}
+		EntityPlayerMP player = (EntityPlayerMP) ev.getEntity() ;
+		if(isWearingEnderBoots(player)){
+			ev.setAttackDamage(0.01f);
+			damageEnderBoots(player);
+		}
+	}
+	
 	@SubscribeEvent
 	public void fallOutOfTeletory(LivingHurtEvent ev) {
 		if (ev.getEntity().getEntityWorld().isRemote || !(ev.getEntity() instanceof EntityPlayerMP)) {

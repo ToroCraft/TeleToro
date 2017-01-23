@@ -64,7 +64,7 @@ public class ItemTeletoryPortalLinker extends Item {
 
 	private void onItemUsedOnPortalBlock(EntityPlayer player, World world, BlockPos pos, ItemStack stack) {
 
-		if (world.isRemote) {
+		if (world.isRemote || player.dimension != 0) {
 			return;
 		}
 

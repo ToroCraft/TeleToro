@@ -66,11 +66,7 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 	}
 
 	@Override
-	protected void onPlayerEnterPortal(final EntityPlayerMP player, final BlockPos pos) {
-		teleport(player, pos);
-	}
-
-	private void teleport(final EntityPlayerMP player, BlockPos thisPortalLocation) {
+	protected void onPlayerEnterPortal(final EntityPlayerMP player, BlockPos thisPortalLocation) {
 
 		ControlBlockLocation thisPortal = ItemTeletoryPortalLinker.findControllerBlock(player.world, thisPortalLocation,
 				ItemTeletoryPortalLinker.LINKED_SIZER);
@@ -126,23 +122,42 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 			}
 		}
 
-		TeleToroUtil.setInvulnerableDimensionChange(player, true);
+		Vec3d transportTo;
 
-		final Vec3d transportTo = new Vec3d(remotePortal.pos.getX() + 0.5, remotePortal.pos.getY() + 0.5, remotePortal.pos.getZ() + 0.5);
+		if (Axis.X.equals(remotePortal.axis)) {
+			transportTo = new Vec3d(d(remotePortal.pos.getX()) + 0.5d, remotePortal.pos.getY() + 1, remotePortal.pos.getZ() + 0.5);
+		} else {
+			transportTo = new Vec3d(remotePortal.pos.getX() + 0.5, remotePortal.pos.getY() + 1, d(remotePortal.pos.getZ()) + 0.5d);
+		}
 
-		player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ENDERMEN_TELEPORT,
-				SoundCategory.PLAYERS, 1.0F, 1.0F);
+		queueTeleport(player, yaw, transportTo);
 
-		
+		// TODO support other entities
+	}
 
+	private double d(int x) {
+		return (double) x;
+	}
+
+	private void queueTeleport(final EntityPlayerMP player, final float yaw, final Vec3d transportTo) {
 		Teletory.runQueue.put(new Runnable() {
 			@Override
 			public void run() {
-				
+
+				if (!player.connection.getNetworkManager().isChannelOpen() || player.isPlayerSleeping()) {
+					return;
+				}
+
+				player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ENDERMEN_TELEPORT,
+						SoundCategory.PLAYERS, 1.0F, 1.0F);
+
+				TeleToroUtil.setInvulnerableDimensionChange(player, true);
+
+				player.connection.setPlayerLocation(transportTo.xCoord, transportTo.yCoord, transportTo.zCoord, yaw, player.rotationPitch);
 				player.motionX = 0.0D;
 				player.motionY = 0.0D;
 				player.motionZ = 0.0D;
-				player.connection.setPlayerLocation(transportTo.xCoord, transportTo.yCoord, transportTo.zCoord, yaw, player.rotationPitch);
+				// player.velocityChanged = true;
 
 				TeleToroUtil.setInvulnerableDimensionChange(player, false);
 
@@ -151,15 +166,16 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 
 				hurtPlayer(player, transportTo);
 			}
-		}, 0);
-
-		// TODO support other entities
-
+		}, 1);
 	}
 
 	private void hurtPlayer(final EntityLivingBase entity, Vec3d transportTo) {
+		if (Teletory.isWearingEnderBoots(entity)) {
+			Teletory.damageEnderBoots(entity);
+			return;
+		}
 		entity.fallDistance = 0.0F;
-		entity.attackEntityFrom(DamageSource.FALL, 6f);
+		entity.attackEntityFrom(DamageSource.FALL, 4f);
 		if (entity.world.rand.nextFloat() < 0.05F && entity.world.getGameRules().getBoolean("doMobSpawning")) {
 			EntityEndermite entityendermite = new EntityEndermite(entity.world);
 			entityendermite.setSpawnedByPlayer(true);
@@ -194,7 +210,7 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 		super.breakBlock(world, pos, state);
 		world.removeTileEntity(pos);
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
