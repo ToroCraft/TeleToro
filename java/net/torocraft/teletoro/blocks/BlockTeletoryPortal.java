@@ -1,14 +1,19 @@
 package net.torocraft.teletoro.blocks;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToro;
@@ -47,6 +52,10 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 	@Override
 	protected void onPlayerEnterPortal(EntityPlayerMP player, BlockPos pos) {
 		Teletory.changeEntityDimension(player, TeleportorType.PORTAL);
+	}
+
+	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+		return new ItemStack(Blocks.AIR);
 	}
 
 	public static class Size extends BlockAbstractPortal.Size {
