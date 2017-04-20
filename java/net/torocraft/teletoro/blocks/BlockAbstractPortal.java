@@ -172,9 +172,8 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 
 	protected abstract void onPlayerEnterPortal(EntityPlayerMP player, BlockPos pos);
 
-	@Nullable
 	public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
-		return null;
+		return ItemStack.EMPTY;
 	}
 
 	/**
@@ -311,6 +310,7 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 		private int width;
 
 		public abstract Block getFrameBlock();
+
 		public abstract BlockAbstractPortal getPortalBlock();
 
 		public Size(World worldIn, BlockPos pos, Axis axis) {
@@ -434,7 +434,7 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 			boolean valid = this.bottomLeft != null && this.width >= 2 && this.width <= 21 && this.height >= 3 && this.height <= 21;
 			return valid;
 		}
-		
+
 		public void placePortalBlocks() {
 			placePortalBlocks(getPortalBlock());
 		}
@@ -445,9 +445,9 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 
 				for (int j = 0; j < this.height; ++j) {
 					IBlockState blockState;
-					if(portalBlock == null){
+					if (portalBlock == null) {
 						blockState = Blocks.AIR.getDefaultState();
-					}else{
+					} else {
 						blockState = portalBlock.getDefaultState().withProperty(BlockAbstractPortal.AXIS, this.axis);
 					}
 					this.world.setBlockState(blockpos.up(j), blockState, 2);

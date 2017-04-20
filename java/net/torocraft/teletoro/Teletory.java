@@ -31,6 +31,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
+import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -39,6 +40,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.torocraft.teletoro.TeleToroUtil.TeleportorType;
 import net.torocraft.teletoro.blocks.BlockEnder;
+import net.torocraft.teletoro.blocks.BlockLinkedTeletoryPortal;
 import net.torocraft.teletoro.blocks.BlockTeletoryPortal;
 import net.torocraft.teletoro.item.armor.ItemEnderArmor;
 import net.torocraft.teletoro.teleporter.FallFromTeletoryTeleporter;
@@ -272,8 +274,8 @@ public class Teletory {
 
 	private void spawnParticles(Entity entity) {
 		for (int i = 0; i < 32; ++i) {
-			entity.world.spawnParticle(EnumParticleTypes.PORTAL, entity.posX, entity.posY + entity.world.rand.nextDouble() * 2.0D, entity.posZ, entity.world.rand.nextGaussian(), 0.0D, entity.world.rand.nextGaussian(),
-					new int[0]);
+			entity.world.spawnParticle(EnumParticleTypes.PORTAL, entity.posX, entity.posY + entity.world.rand.nextDouble() * 2.0D, entity.posZ,
+					entity.world.rand.nextGaussian(), 0.0D, entity.world.rand.nextGaussian(), new int[0]);
 		}
 	}
 
@@ -324,21 +326,30 @@ public class Teletory {
 			}
 		}
 	}
-	
-	
+
+	@SubscribeEvent
+	public void enderPearlTeleport(BreakEvent ev) {
+		if(ev.getPlayer() == null || ev.getPlayer().isCreative()){
+			return;
+		}
+		
+		if (ev.getState().getBlock() == BlockTeletoryPortal.INSTANCE || ev.getState().getBlock() == BlockLinkedTeletoryPortal.INSTANCE) {
+			ev.setCanceled(true);
+		}
+	}
 
 	@SubscribeEvent
 	public void enderPearlTeleport(EnderTeleportEvent ev) {
 		if (ev.getEntity().getEntityWorld().isRemote || !(ev.getEntity() instanceof EntityPlayerMP)) {
 			return;
 		}
-		EntityPlayerMP player = (EntityPlayerMP) ev.getEntity() ;
-		if(isWearingEnderBoots(player)){
+		EntityPlayerMP player = (EntityPlayerMP) ev.getEntity();
+		if (isWearingEnderBoots(player)) {
 			ev.setAttackDamage(0.01f);
 			damageEnderBoots(player);
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void fallOutOfTeletory(LivingHurtEvent ev) {
 		if (ev.getEntity().getEntityWorld().isRemote || !(ev.getEntity() instanceof EntityPlayerMP)) {
