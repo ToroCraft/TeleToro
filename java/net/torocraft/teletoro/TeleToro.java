@@ -14,7 +14,7 @@ import net.torocraft.teletoro.blocks.BlockEnder;
 public class TeleToro {
 
 	public static final String MODID = "teletoro";
-	public static final String VERSION = "1.11.2-23";
+	public static final String VERSION = "1.11.2-24";
 	public static final String MODNAME = "TeleToro";
 
 	@SidedProxy(clientSide = "net.torocraft.teletoro.ClientProxy", serverSide = "net.torocraft.teletoro.ServerProxy")

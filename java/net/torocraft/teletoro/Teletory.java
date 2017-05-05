@@ -126,7 +126,7 @@ public class Teletory {
 			return;
 		}
 
-		if (event.getBlockSnapshot().getPos().getY() > TeletoryWorldProvider.HEIGHT) {
+		if (event.getBlockSnapshot().getPos().getY() > 32) {
 			event.getPlayer().sendMessage(new TextComponentString("max build height"));
 			event.setCanceled(true);
 		}
