@@ -32,18 +32,6 @@ public class TeletoryWorldProvider extends WorldProvider {
 		return Teletory.TYPE;
 	}
 
-	public static final int HEIGHT = 32;
-
-	@Override
-	public int getActualHeight() {
-		return HEIGHT;
-	}
-
-	@Override
-	public int getHeight() {
-		return HEIGHT;
-	}
-
 	@Override
 	@SideOnly(Side.CLIENT)
 	public Vec3d getFogColor(float par1, float par2) {
