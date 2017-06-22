@@ -155,7 +155,7 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 
 				TeleToroUtil.setInvulnerableDimensionChange(player, true);
 
-				player.connection.setPlayerLocation(transportTo.xCoord, transportTo.yCoord, transportTo.zCoord, yaw, player.rotationPitch);
+				player.connection.setPlayerLocation(transportTo.x, transportTo.y, transportTo.z, yaw, player.rotationPitch);
 				player.motionX = 0.0D;
 				player.motionY = 0.0D;
 				player.motionZ = 0.0D;
@@ -163,7 +163,7 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 
 				TeleToroUtil.setInvulnerableDimensionChange(player, false);
 
-				player.world.playSound((EntityPlayer) null, transportTo.xCoord, transportTo.yCoord, transportTo.zCoord,
+				player.world.playSound((EntityPlayer) null, transportTo.x, transportTo.y, transportTo.z,
 						SoundEvents.ENTITY_ENDERMEN_TELEPORT, SoundCategory.PLAYERS, 1.0F, 1.0F);
 
 				hurtPlayer(player, transportTo);
@@ -181,8 +181,8 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 		if (entity.world.rand.nextFloat() < 0.05F && entity.world.getGameRules().getBoolean("doMobSpawning")) {
 			EntityEndermite entityendermite = new EntityEndermite(entity.world);
 			entityendermite.setSpawnedByPlayer(true);
-			System.out.println("spawn at " + transportTo.xCoord + " " + transportTo.yCoord + " " + transportTo.zCoord);
-			entityendermite.setLocationAndAngles(transportTo.xCoord, transportTo.yCoord, transportTo.zCoord, entity.rotationYaw,
+			System.out.println("spawn at " + transportTo.x + " " + transportTo.y + " " + transportTo.z);
+			entityendermite.setLocationAndAngles(transportTo.x, transportTo.y, transportTo.z, entity.rotationYaw,
 					entity.rotationPitch);
 			entity.world.spawnEntity(entityendermite);
 		}

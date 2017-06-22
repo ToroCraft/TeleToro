@@ -5,7 +5,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeProviderSingle;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.client.IRenderHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -15,7 +15,7 @@ public class TeletoryWorldProvider extends WorldProvider {
 
 	public TeletoryWorldProvider() {
 		this.biomeProvider = new BiomeProviderSingle(Biomes.VOID);
-		this.hasNoSky = true;
+		this.hasSkyLight = false;
 	}
 
 	@Override
@@ -72,11 +72,6 @@ public class TeletoryWorldProvider extends WorldProvider {
 	@Override
 	public boolean hasSkyLight() {
 		return false;
-	}
-
-	@Override
-	public boolean hasNoSky() {
-		return true;
 	}
 
 	@Override

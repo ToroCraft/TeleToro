@@ -11,7 +11,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.gen.IChunkGenerator;
 
 public class EmptyChunkProvider implements IChunkGenerator {
 	private final World worldObj;
@@ -27,6 +27,11 @@ public class EmptyChunkProvider implements IChunkGenerator {
 		return chunk;
 	}
 
+	@Override
+	public Chunk generateChunk(int x, int z) {
+		return null;
+	}
+
 	public void populate(int x, int z) {
 
 	}
@@ -40,6 +45,12 @@ public class EmptyChunkProvider implements IChunkGenerator {
 	}
 
 	@Nullable
+	@Override
+	public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position, boolean findUnexplored) {
+		return null;
+	}
+
+	@Nullable
 	public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position) {
 		return null;
 	}
@@ -49,7 +60,8 @@ public class EmptyChunkProvider implements IChunkGenerator {
 	}
 
 	@Override
-	public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position, boolean p_180513_4_) {
-		return null;
+	public boolean isInsideStructure(World worldIn, String structureName, BlockPos pos) {
+		return false;
 	}
+
 }

@@ -103,7 +103,8 @@ public class Teletory {
 			}
 
 			if (player.dimension == Teletory.DIMID) {
-				player.addStat(TeleToro.TELETORY_ACHIEVEMNT);
+				//TODO
+				//player.addStat(TeleToro.TELETORY_ACHIEVEMNT);
 			}
 		}
 	}
@@ -378,7 +379,7 @@ public class Teletory {
 			return false;
 		}
 
-		WorldServer world = player.mcServer.worldServerForDimension(dimId);
+		WorldServer world = player.mcServer.getWorld(dimId);
 
 		Teleporter teleporter = getTeleporter(world, type);
 

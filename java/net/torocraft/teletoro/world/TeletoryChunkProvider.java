@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
 import net.torocraft.teletoro.blocks.BlockEnderOre;
 
@@ -54,7 +54,8 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 		noise1 = new NoiseGeneratorOctaves(random, 8);
 	}
 
-	public Chunk provideChunk(int chunkX, int chunkZ) {
+	@Override
+	public Chunk generateChunk(int chunkX, int chunkZ) {
 		ChunkPrimer chunkprimer = new ChunkPrimer();
 		int xOffset = chunkX * 16;
 		int zOffset = chunkZ * 16;
@@ -136,7 +137,8 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 	}
 
 	@Nullable
-	public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position) {
+	@Override
+	public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position, boolean findUnexplored) {
 		return null;
 	}
 
@@ -145,7 +147,8 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 	}
 
 	@Override
-	public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position, boolean p_180513_4_) {
-		return null;
+	public boolean isInsideStructure(World worldIn, String structureName, BlockPos pos) {
+		return false;
 	}
+
 }

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  b",
+    " p ",
+    "p  "
+  ],
+  "key": {
+    "p": {
+      "item": "teletoro:teletorypearl"
+    },
+    "b": {
+      "item": "teletoro:enderblock"
+    }
+  },
+  "result": {
+    "item": "teletoro:teletory_portal_linker"
+  }
+}

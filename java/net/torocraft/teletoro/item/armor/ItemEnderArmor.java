@@ -2,15 +2,18 @@ package net.torocraft.teletoro.item.armor;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -25,8 +28,6 @@ public class ItemEnderArmor extends ItemArmor {
 
 	public static void init() {
 		initBoots();
-		GameRegistry.addRecipe(new ItemStack(bootsItem), "   ", "# #", "# #", '#', Items.ENDER_PEARL);
-		GameRegistry.addRecipe(new ItemStack(bootsItem), "# #", "# #", "   ", '#', Items.ENDER_PEARL);
 	}
 
 	public static void registerRenders() {
@@ -60,8 +61,8 @@ public class ItemEnderArmor extends ItemArmor {
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		super.addInformation(stack, playerIn, tooltip, advanced);
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+		super.addInformation(stack, worldIn, tooltip, flagIn);
 		tooltip.add(I18n.format("item.ender_boots.tooltip", new Object[0]));
 	}
 

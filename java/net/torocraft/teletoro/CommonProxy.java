@@ -21,24 +21,19 @@ import net.torocraft.teletoro.material.ArmorMaterials;
 public class CommonProxy {
 	public void preInit(FMLPreInitializationEvent e) {
 		ItemTeletoryPortalLinker.init();
-	}
-
-	public void init(FMLInitializationEvent e) {
 		ArmorMaterials.init();
 		ItemEnderArmor.init();
 		BlockTeletoryPortal.init();
 		BlockLinkedTeletoryPortal.init();
 		BlockEnder.init();
 		BlockEnderOre.init();
-		
 		TileEntityLinkedTeletoryPortal.init();
-
 		ItemTeletoryPearl.init();
-		
 		EntityTeletoryPearl.init(150);
+	}
+
+	public void init(FMLInitializationEvent e) {
 		setupTheTeletory(e);
-		GameRegistry.addRecipe(new ItemStack(ItemTeletoryPortalLinker.INSTANCE), "  b", " p ", "p  ", 'b', BlockEnder.INSTANCE, 'p',  ItemTeletoryPearl.INSTANCE);
-		GameRegistry.addRecipe(new ItemStack(BlockEnder.INSTANCE), "##", "##", '#', Items.ENDER_PEARL);
 		GameRegistry.addSmelting(BlockEnderOre.ITEM_INSTANCE, new ItemStack(ItemTeletoryPearl.INSTANCE), 1);
 		GameRegistry.addSmelting(new ItemStack(ItemTeletoryPearl.INSTANCE), new ItemStack(Items.ENDER_PEARL), 1);
 	}

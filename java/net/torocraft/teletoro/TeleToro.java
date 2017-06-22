@@ -1,6 +1,5 @@
 package net.torocraft.teletoro;
 
-import net.minecraft.stats.Achievement;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -14,7 +13,7 @@ import net.torocraft.teletoro.blocks.BlockEnder;
 public class TeleToro {
 
 	public static final String MODID = "teletoro";
-	public static final String VERSION = "1.11.2-24";
+	public static final String VERSION = "1.12-24";
 	public static final String MODNAME = "TeleToro";
 
 	@SidedProxy(clientSide = "net.torocraft.teletoro.ClientProxy", serverSide = "net.torocraft.teletoro.ServerProxy")
@@ -23,7 +22,8 @@ public class TeleToro {
 	@Instance(value = TeleToro.MODID)
 	public static TeleToro instance;
 
-	public static Achievement TELETORY_ACHIEVEMNT;
+	//TODO
+	//public static Achievement TELETORY_ACHIEVEMNT;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
@@ -38,7 +38,8 @@ public class TeleToro {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent e) {
 		proxy.postInit(e);
-		TELETORY_ACHIEVEMNT = new Achievement("teletory", "teletory_achievement", 0, 0, BlockEnder.INSTANCE, null).registerStat();
+		//TODO
+		//TELETORY_ACHIEVEMNT = new Achievement("teletory", "teletory_achievement", 0, 0, BlockEnder.INSTANCE, null).registerStat();
 	}
 
 }
