@@ -12,13 +12,6 @@ public class TeletoryPearlTeleporter extends FallFromTeletoryTeleporter {
 		super(worldIn);
 	}
 
-	protected boolean fallIntoTeletory(Entity entity, float rotationYaw, PortalSearchState search) {
-		BlockPos placement = findTopOfWorld(search);
-		placement = addBlockUnderPlayer(placement);
-		standardPlacementValues(entity, rotationYaw, placement);
-		return true;
-	}
-
 	protected BlockPos addBlockUnderPlayer(BlockPos placement) {
 		if (placement.getY() < 5) {
 			placement = new BlockPos(placement.getX(), TeletoryChunkProvider.dirtHeight, placement.getZ());
@@ -30,7 +23,7 @@ public class TeletoryPearlTeleporter extends FallFromTeletoryTeleporter {
 
 	protected boolean fallIntoOverWorld(Entity entity, float rotationYaw, PortalSearchState search) {
 		BlockPos placement = findTopOfWorld(search);
-
+		placement = addBlockUnderPlayer(placement);
 		standardPlacementValues(entity, rotationYaw, placement);
 		return true;
 	}

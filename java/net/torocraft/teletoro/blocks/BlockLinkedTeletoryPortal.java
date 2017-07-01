@@ -25,6 +25,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -34,6 +37,7 @@ import net.torocraft.teletoro.Teletory;
 import net.torocraft.teletoro.item.ItemTeletoryPortalLinker;
 import net.torocraft.teletoro.item.ItemTeletoryPortalLinker.ControlBlockLocation;
 
+@EventBusSubscriber
 public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements ITileEntityProvider {
 
 	public static BlockLinkedTeletoryPortal INSTANCE;
@@ -42,15 +46,20 @@ public class BlockLinkedTeletoryPortal extends BlockAbstractPortal implements IT
 
 	public static final String NAME = "linkedteletoryportalblock";
 
-	public static void init() {
-		INSTANCE = (BlockLinkedTeletoryPortal) new BlockLinkedTeletoryPortal().setUnlocalizedName(NAME);
-		ResourceLocation resourceName = new ResourceLocation(TeleToro.MODID, NAME);
-		INSTANCE.setRegistryName(resourceName);
-		GameRegistry.register(INSTANCE);
+	public static ResourceLocation REGISTRY_NAME = new ResourceLocation(TeleToro.MODID, NAME);
 
+	@SubscribeEvent
+	public static void init(RegistryEvent.Register<Block> event) {
+		INSTANCE = (BlockLinkedTeletoryPortal) new BlockLinkedTeletoryPortal().setUnlocalizedName(NAME);
+		INSTANCE.setRegistryName(REGISTRY_NAME);
+		event.getRegistry().register(INSTANCE);
+	}
+
+	@SubscribeEvent
+	public static void initItem(RegistryEvent.Register<Item> event) {
 		ITEM_INSTANCE = new ItemBlock(INSTANCE);
-		ITEM_INSTANCE.setRegistryName(resourceName);
-		GameRegistry.register(ITEM_INSTANCE);
+		ITEM_INSTANCE.setRegistryName(REGISTRY_NAME);
+		event.getRegistry().register(ITEM_INSTANCE);
 	}
 
 	public static void registerRenders() {

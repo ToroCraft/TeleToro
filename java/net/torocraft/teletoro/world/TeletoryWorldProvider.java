@@ -18,16 +18,6 @@ public class TeletoryWorldProvider extends WorldProvider {
 		this.hasSkyLight = false;
 	}
 
-	@Override
-	public String getWelcomeMessage() {
-		return "Entering the Teletory";
-	}
-
-	@Override
-	public String getDepartMessage() {
-		return "Leaving the Teletory";
-	}
-
 	public DimensionType getDimensionType() {
 		return Teletory.TYPE;
 	}

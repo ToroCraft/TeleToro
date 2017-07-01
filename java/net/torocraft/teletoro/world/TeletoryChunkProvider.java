@@ -37,10 +37,10 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 
 	private final int yOffset = 0;
 
-	private final IBlockState base = Blocks.END_STONE.getDefaultState();
-	private final IBlockState dirt = Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT);
-	private final IBlockState ore = BlockEnderOre.INSTANCE.getDefaultState();
-	private final IBlockState bush = Blocks.DEADBUSH.getDefaultState();
+	private final IBlockState base;
+	private final IBlockState dirt;
+	private final IBlockState ore;
+	private final IBlockState bush;
 
 	public static final int surfaceHeight = 8;
 	public static final int surfaceThickness = 5;
@@ -52,6 +52,10 @@ public class TeletoryChunkProvider implements IChunkGenerator {
 		world = worldIn;
 		random = new Random(seed);
 		noise1 = new NoiseGeneratorOctaves(random, 8);
+		base = Blocks.END_STONE.getDefaultState();
+		dirt = Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT);
+		ore = BlockEnderOre.INSTANCE.getDefaultState();
+		bush = Blocks.DEADBUSH.getDefaultState();
 	}
 
 	@Override

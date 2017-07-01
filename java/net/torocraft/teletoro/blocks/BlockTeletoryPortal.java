@@ -15,11 +15,15 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToro;
 import net.torocraft.teletoro.TeleToroUtil.TeleportorType;
 import net.torocraft.teletoro.Teletory;
 
+@EventBusSubscriber
 public class BlockTeletoryPortal extends BlockAbstractPortal {
 
 	public static BlockTeletoryPortal INSTANCE;
@@ -28,15 +32,20 @@ public class BlockTeletoryPortal extends BlockAbstractPortal {
 
 	public static final String NAME = "teletoryportalblock";
 
-	public static void init() {
-		INSTANCE = (BlockTeletoryPortal) new BlockTeletoryPortal().setUnlocalizedName(NAME);
-		ResourceLocation resourceName = new ResourceLocation(TeleToro.MODID, NAME);
-		INSTANCE.setRegistryName(resourceName);
-		GameRegistry.register(INSTANCE);
+	public static ResourceLocation REGISTRY_NAME = new ResourceLocation(TeleToro.MODID, NAME);
 
+	@SubscribeEvent
+	public static void init(RegistryEvent.Register<Block> event) {
+		INSTANCE = (BlockTeletoryPortal) new BlockTeletoryPortal().setUnlocalizedName(NAME);
+		INSTANCE.setRegistryName(REGISTRY_NAME);
+		event.getRegistry().register(INSTANCE);
+	}
+
+	@SubscribeEvent
+	public static void initItem(RegistryEvent.Register<Item> event) {
 		ITEM_INSTANCE = new ItemBlock(INSTANCE);
-		ITEM_INSTANCE.setRegistryName(resourceName);
-		GameRegistry.register(ITEM_INSTANCE);
+		ITEM_INSTANCE.setRegistryName(REGISTRY_NAME);
+		event.getRegistry().register(ITEM_INSTANCE);
 	}
 
 	public static void registerRenders() {

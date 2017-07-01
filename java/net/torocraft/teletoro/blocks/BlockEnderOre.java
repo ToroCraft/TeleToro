@@ -14,9 +14,13 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToro;
 
+@EventBusSubscriber
 public class BlockEnderOre extends Block {
 
 	public static BlockEnderOre INSTANCE;
@@ -25,15 +29,20 @@ public class BlockEnderOre extends Block {
 
 	public static final String NAME = "enderore";
 
-	public static void init() {
-		INSTANCE = new BlockEnderOre();
-		ResourceLocation resourceName = new ResourceLocation(TeleToro.MODID, NAME);
-		INSTANCE.setRegistryName(resourceName);
-		GameRegistry.register(INSTANCE);
+	public static ResourceLocation REGISTRY_NAME = new ResourceLocation(TeleToro.MODID, NAME);
 
+	@SubscribeEvent
+	public static void init(RegistryEvent.Register<Block> event) {
+		INSTANCE = new BlockEnderOre();
+		INSTANCE.setRegistryName(REGISTRY_NAME);
+		event.getRegistry().register(INSTANCE);
+	}
+
+	@SubscribeEvent
+	public static void initItem(RegistryEvent.Register<Item> event) {
 		ITEM_INSTANCE = new ItemBlock(INSTANCE);
-		ITEM_INSTANCE.setRegistryName(resourceName);
-		GameRegistry.register(ITEM_INSTANCE);
+		ITEM_INSTANCE.setRegistryName(REGISTRY_NAME);
+		event.getRegistry().register(ITEM_INSTANCE);
 	}
 
 	public static void registerRenders() {

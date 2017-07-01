@@ -1,6 +1,8 @@
 package net.torocraft.teletoro;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemMeshDefinition;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.model.ModelLoader;
@@ -20,22 +22,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void preInit(FMLPreInitializationEvent e) {
 		super.preInit(e);
-		registerRendersForLinker();
-	}
 
-	public static void registerRendersForLinker() {
-		ModelLoader.setCustomMeshDefinition(ItemTeletoryPortalLinker.INSTANCE, new ItemMeshDefinition() {
-			@Override
-			public ModelResourceLocation getModelLocation(ItemStack stack) {
-				if (ItemTeletoryPortalLinker.isActive(stack)) {
-					return ItemTeletoryPortalLinker.modelOn;
-				} else {
-					return ItemTeletoryPortalLinker.model;
-				}
-			}
-		});
-		ModelLoader.registerItemVariants(ItemTeletoryPortalLinker.INSTANCE,
-				new ModelResourceLocation[] { ItemTeletoryPortalLinker.model, ItemTeletoryPortalLinker.modelOn });
 	}
 
 	@Override
@@ -47,12 +34,13 @@ public class ClientProxy extends CommonProxy {
 		BlockEnderOre.registerRenders();
 		BlockLinkedTeletoryPortal.registerRenders();
 		ItemTeletoryPearl.registerRenders();
-
 	}
 
 	@Override
 	public void postInit(FMLPostInitializationEvent e) {
 		super.postInit(e);
+		//TODO get dynamic item texture working: ItemTeletoryPortalLinker.registerRendersForLinker();
+		ItemTeletoryPortalLinker.registerRendersForLinkerStatic();
 	}
 
 }

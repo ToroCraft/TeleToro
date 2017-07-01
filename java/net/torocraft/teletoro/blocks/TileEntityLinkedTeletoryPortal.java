@@ -3,8 +3,10 @@ package net.torocraft.teletoro.blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
+@EventBusSubscriber
 public class TileEntityLinkedTeletoryPortal extends TileEntity {
 
 	public static final String NAME = "linked_teletory_portal_tile_entity";

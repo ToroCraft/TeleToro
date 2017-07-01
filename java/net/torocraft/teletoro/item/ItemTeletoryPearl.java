@@ -15,19 +15,24 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.torocraft.teletoro.TeleToro;
 
+@Mod.EventBusSubscriber
 public class ItemTeletoryPearl extends Item {
 
 	public static ItemTeletoryPearl INSTANCE;
 
 	public static final String NAME = "teletorypearl";
 
-	public static void init() {
+	@SubscribeEvent
+	public static void init(RegistryEvent.Register<Item> event) {
 		INSTANCE = new ItemTeletoryPearl();
-		ResourceLocation resourceName = new ResourceLocation(TeleToro.MODID, NAME.toLowerCase());
-		GameRegistry.register(INSTANCE, resourceName);
+		INSTANCE.setRegistryName(new ResourceLocation(TeleToro.MODID, NAME.toLowerCase()));
+		event.getRegistry().register(INSTANCE);
 	}
 
 	public static void registerRenders() {

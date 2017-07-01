@@ -20,15 +20,8 @@ import net.torocraft.teletoro.material.ArmorMaterials;
 
 public class CommonProxy {
 	public void preInit(FMLPreInitializationEvent e) {
-		ItemTeletoryPortalLinker.init();
 		ArmorMaterials.init();
-		ItemEnderArmor.init();
-		BlockTeletoryPortal.init();
-		BlockLinkedTeletoryPortal.init();
-		BlockEnder.init();
-		BlockEnderOre.init();
 		TileEntityLinkedTeletoryPortal.init();
-		ItemTeletoryPearl.init();
 		EntityTeletoryPearl.init(150);
 	}
 
