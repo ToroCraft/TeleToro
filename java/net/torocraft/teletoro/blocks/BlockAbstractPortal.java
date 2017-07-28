@@ -423,7 +423,13 @@ public abstract class BlockAbstractPortal extends BlockBreakable {
 
 		@SuppressWarnings("deprecation")
 		private Material getMaterial(Block blockIn) {
-			return blockIn.getMaterial(null);
+			try {
+				return blockIn.getMaterial(null);
+			}catch (Exception e){
+				// bloody unicorn hack!
+				// https://github.com/ToroCraft/TeleToro/issues/18
+				return Material.ROCK;
+			}
 		}
 
 		protected boolean isEmptyBlock(Block blockIn) {
