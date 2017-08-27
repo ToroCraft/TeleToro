@@ -16,9 +16,13 @@ out
 # gradle
 build
 .gradle
+gradle/
+gradlew
+gradlew.bat
+classes/
+logs/
 
 # other
 eclipse
 run
 
-src/main/resources/assets/teletoro/textures/blocks/tmp
