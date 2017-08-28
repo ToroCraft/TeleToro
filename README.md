@@ -16,3 +16,22 @@ Hints
 ![Screenshot](https://i.imgur.com/9bYht58.png)
 
 ![Screenshot](https://i.imgur.com/37n2eOs.png)
+
+
+## Development Environment Setup
+
+```
+git clone git@github.com:ToroCraft/TeleToro.git
+cd TeleToro
+gradle setupDecompWorkspace
+```
+
+To setup an Intellij environment:
+```
+gradle idea
+```
+
+To setup an Eclipse environment:
+```
+gradle eclipse
+```
