@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "": {
+            "model": "teletoro:block/ender_block"
+        }
+    }
+}

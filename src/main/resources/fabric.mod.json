@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "teletoro",
+  "version": "${version}",
+
+  "name": "TeleToro",
+  "description": "Dimension used for faster travel",
+  "authors": [
+    "ToroCraft"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/teletoro",
+    "issues": "https://github.com/ToroCraft/TeleToro/issues",
+    "sources": "https://github.com/ToroCraft/TeleToro"
+  },
+
+  "license": "GPL3",
+  "icon": "assets/teletoro/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.torocraft.teletoro.TeleToro"
+    ]
+  },
+  "mixins": [
+    "teletoro.mixins.json"
+  ],
+
+  "suggests": {
+    "modmenu": "*"
+  },
+
+  "depends": {
+    "fabricloader": ">=0.4.0",
+    "fabric": "*"
+  }
+}
